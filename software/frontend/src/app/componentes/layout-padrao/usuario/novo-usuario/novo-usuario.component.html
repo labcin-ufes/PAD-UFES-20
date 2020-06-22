@@ -1,0 +1,256 @@
+<div class="animated fadeIn">    
+  <div class="row">
+    <div class="col-md-3"></div>
+    <div class="col-md-6">
+      <div class="card">
+        
+        <!-- CABEÇALHO DO CADASTRO -->
+        <div class="card-header">
+            <i class="fa fa-user-plus"></i>
+            <span class="tituloTabela"> Cadastro de usuário </span>
+        </div>
+
+               
+
+        <!-- CORPO DO CADASTRO -->
+        <div class="card-body">
+          <form 
+            #dadosCadastroForm="ngForm" 
+            (ngSubmit)="recebeCadastroForm()">
+
+            <!-- INFORMACAO PARA CADASTRO -->
+            <div *ngIf="flagRespostaCadastro !== 'false'">
+              <div *ngIf="flagRespostaCadastro === 'problema-requisicao'" class="alert alert-danger text-center" role="alert">
+                Houve um problema na comunicação com o banco de dados. Tente mais tarde ou entre em contado com os desenvolvedores.
+              </div>
+
+              <div *ngIf="flagRespostaCadastro === 'usuario-existente'" class="alert alert-warning text-center" role="alert">
+                O nome de usuário ou email fornecido já está cadastrado no banco. Por favor, utilize outro valor e tente novamente.
+              </div>
+
+              <div *ngIf="flagRespostaCadastro === 'usuario-cadastrado'" class="alert alert-success text-center" role="alert">
+                O usuário(a) <strong> {{ usuario.nomeCompleto }} </strong> foi cadastrado com sucesso. Seu nome de usuário(a) é 
+                <strong> {{ usuario.nomeUsuario}} </strong> e ele já possui acesso ao sistema.
+              </div>
+            </div>
+            <!-- INFORMACAO PARA CADASTRO --> 
+            
+            <!-- FORMGROUP - NOME COMPLETO -->
+            <div class="form-group">
+              <div class="input-group">
+
+                  <!-- INPUT NOME COMPLETO -->
+                  <input 
+                    type="text"
+                    class="form-control"                     
+                    name="nomeCompleto" 
+                    placeholder="Nome completo"
+                    ngModel
+                    minlength=3
+                    #nomecompleto="ngModel" 
+                    required>
+                  <!-- INPUT NOME COMPLETO -->
+
+                <div class="input-group-prepend">
+                  <span class="input-group-text"><i class="fa fa-user"></i></span>
+                </div>
+
+              </div>
+
+              <div *ngIf="!nomecompleto.valid && nomecompleto.touched" class="invalido">
+                Nome completo obrigatório.
+              </div>
+
+            </div>
+
+            <!-- FORMGROUP - NOME USUÁRIO -->
+            <div class="form-group">
+              <div class="input-group">
+
+                  <!-- INPUT NOME USUARIO -->
+                  <input 
+                    type="text" 
+                    class="form-control"
+                    name="nomeUsuario" 
+                    placeholder="Nome de usuário"
+                    ngModel 
+                    #nomeusuario="ngModel"
+                    minlength=3
+                    required>
+                  <!-- INPUT NOME USUARIO -->
+
+                <div class="input-group-prepend">
+                  <span class="input-group-text"><i class="fa fa-user"></i></span>
+                </div>
+
+              </div>
+
+              <div *ngIf="!nomeusuario.valid && nomeusuario.touched" class="invalido">
+                Nome de usuário obrigatório.
+              </div>
+
+            </div>
+
+            <!-- FORMGROUP - EMAIL -->
+            <div class="form-group">
+                <div class="input-group">
+
+                    <!-- INPUT EMAIL -->
+                    <input 
+                      type="email" 
+                      class="form-control" 
+                      name="email" 
+                      placeholder="Email" 
+                      autocomplete="email"
+                      ngModel 
+                      required 
+                      email 
+                      #email="ngModel">
+                    <!-- INPUT EMAIL -->
+
+                  <div class="input-group-prepend">
+                    <span class="input-group-text"><i class="fa fa-envelope"></i></span>
+                  </div>
+
+                </div>
+
+                <div *ngIf="!email.valid && email.touched" class="invalido">
+                  Digite um email válido
+                </div>
+
+            </div>            
+
+            <!-- FORMGROUP - SENHA -->
+            <div class="form-group">
+              <div class="input-group">
+
+                  <!-- INPUT SENHA -->
+                  <input 
+                    type="password" 
+                    class="form-control"
+                    name="senha" 
+                    placeholder="Senha" 
+                    ngModel 
+                    minlength=6
+                    required 
+                    #senha="ngModel" 
+                    (change)="checaSenhasIguais()">
+                  <!-- INPUT SENHA -->
+
+                <div class="input-group-prepend">
+                  <span class="input-group-text"><i class="fa fa-asterisk"></i></span>
+                </div>
+
+              </div>
+              <div *ngIf="!senha.valid && senha.touched" class="invalido">
+                Digite uma senha de no mínimo 6 caracteres
+              </div>
+
+            </div>
+
+            <!-- FORMGROUP - REPETIR SENHA -->
+            <div class="form-group">
+                <div class="input-group">
+
+                    <!-- INPUT SENHA REPETIDA-->
+                    <input 
+                      type="password" 
+                      class="form-control" 
+                      name="repsenha" 
+                      placeholder="Repita a senha" 
+                      minlength=6 
+                      ngModel 
+                      required 
+                      #repsenha="ngModel" 
+                      (change)="checaSenhasIguais()">
+                    <!-- INPUT SENHA REPETIDA -->
+
+                  <div class="input-group-prepend">
+                    <span class="input-group-text"><i class="fa fa-asterisk"></i></span>
+                  </div>
+
+                </div>
+                <div *ngIf="!repsenha.valid && repsenha.touched" class="invalido">
+                  Digite uma senha de no mínimo 6 caracteres
+                </div>
+
+                <div *ngIf="flagSenhaIncompativel" class="invalido">
+                  As duas senhas devem ser iguais
+                </div>
+
+              </div>
+
+            <!-- FORMGROUP - NÍVEL DE ACESSO -->
+            <div class="form-group">
+            
+              <label class="form-col-form-label" for="user-role">Nível de acesso</label>
+
+              <!-- POPOVER DE AJUDA PARA SELECIONAR O PAPEL DO USUARIO -->
+              <button type="button" class="btn btn-info btn-sm"
+                      popover="Define o as funcionalidades de um usuário. Um administrador tem acesso a tudo, 
+                      visualização, edição e exclusão de pacientes. Já um usuário comum pode apenas cadastrar e visualizar pacientes."
+                      popoverTitle="Nível de acesso"
+                      placement="right"
+                >
+                <i class="fa fa-question"></i>
+              </button>              
+              <!-- POPOVER DE AJUDA PARA SELECIONAR O PAPEL DO USUARIO -->
+              
+              <div>
+                <!-- SELECT NIVEL DE ACESSO -->
+                <select
+                  class="form-control" 
+                  ngModel
+                  name="papel"
+                  #papelSelect="ngModel"                  
+                  required>
+                  <option value="USER">USUÁRIO COMUM</option>
+                  <option value="ADMIN">ADMNISTRADOR</option>
+                </select>
+                <!-- SELECT NIVEL DE ACESSO -->
+
+              </div>
+
+              <div *ngIf="papelSelect.invalid && papelSelect.touched" class="invalido">
+                Digite uma email válido
+              </div>
+            </div>
+
+            <div class="form-group">
+                <div class="input-group">
+                  
+                  <!-- INPUT TERMO DE USO -->
+                  
+                    <input type="checkbox" id="termoDeUso" name="termoDeUso" ngModel #termoDeUso="ngModel" required>
+                    <label  class ="labelTermos" for="termoDeUso">Eu aceito os <a [routerLink]="['/termos-de-uso']" target="_blank">Termos de Uso</a></label>
+                    
+                   
+                   
+                  <!-- INPUT TERMO DE USO -->
+
+                </div>
+                <div>
+                  <small *ngIf="termoDeUso.invalid && termoDeUso.touched" class="form-text text-danger">Para realizar o cadastro você deve concordar com os termos de uso</small>
+                </div>
+            </div>
+           
+              <div class="text-left" id="botaoCadastrar">
+              <!-- BUTTON SUBMISSAO -->
+              <button 
+                type="submit" 
+                class="btn btn-success btn-lg"
+                [disabled]="dadosCadastroForm.invalid || flagSenhaIncompativel">
+                Cadastrar
+                <i class="cui-check"></i>
+              </button>
+              <!-- BUTTON SUBMISSAO -->
+            </div>
+
+          </form>
+        </div>
+        <!-- FIM CORPO DO CADASTRO -->
+
+      </div>
+    </div>
+  </div>
+</div>

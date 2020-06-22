@@ -1,0 +1,7 @@
+.tab { 
+    text-indent:40px;
+ }
+
+span[type="switch-slider"]{
+    transform:scale(1.5);
+}

@@ -1,0 +1,502 @@
+<div class="animated fadeIn">
+
+    <!-- CARD PARA CASO DE FALHA NA REQUISICAO  -->
+    <div class="row" *ngIf="flagFalhaReqURL">
+        <div class="col-lg-12">
+            
+            <div class="card">
+                <div class="card-header">
+                    <h4> Falha de comunicação <i class="fa fa-exclamation-triangle"></i> </h4>                        
+                </div>
+
+                <div class="card-body">
+                    <div class="alert alert-danger" role="alert">
+                        Infelizmente ocorreu uma falha de comunicação. Tente acessar mais tarde. Caso persista, entre em contato
+                        com os desenvolvedores.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- CARD PARA CASO DE FALHA NA REQUISICAO  -->
+
+
+
+    <!-- BUSCAR CARTÃO SUS CASO NAO VENHA COMO PARAMETRO --> 
+    <div class="row" *ngIf="cartaoSusURL === undefined && !flagFalhaReqURL && cartaoSusURL !== 'invalido'">
+        <div class="col-lg-12">
+            
+            <!-- BUSCAR CARTÃO SUS CASO NAO VENHA COMO PARAMETRO -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="fa fa-search"></i>
+                    <span class="tituloTabela"> Buscar Paciente </span>                                                
+                </div>
+
+                <div class="card-body">
+
+                    <!-- AVISO PARA CASO NAO ENCONTRE O PACIENTE -->
+                    <div class="alert alert-warning" role="alert" *ngIf="pacienteNaoEncontrado">                        
+                        <p> O paciente com cartão do sus <strong> {{ cartaoSusForm }} </strong> não está cadastrado no sistema! </p>                                                
+                    </div>
+                    <!-- AVISO PARA CASO NAO ENCONTRE O PACIENTE -->
+
+                    <!-- INICIO DA BUSCA DO PACIENTE -->
+                    <div class="row">
+                        <div class="form-group col-8">
+                            <!-- POPOVER SOBRE A BUSCA -->
+                            <label for="cartaoSus">Digite o número do cartão do SUS: 
+                                <button 
+                                    class="btn btn-info btn-sm" 
+                                    placement="right" 
+                                    popover="Para inserir uma lesão, primeiro você deve informar o paciente." 
+                                    type="button">
+                                    <i class="fa fa-question"></i>
+                                </button>
+                            </label>
+                            <!-- POPOVER SOBRE A BUSCA -->
+
+                            <input 
+                                id="cartaoSus"
+                                type="text"
+                                class="form-control" 
+                                [dropSpecialCharacters]="false"
+                                [(ngModel)]="cartaoSusForm" 
+                                mask="000-0000-0000-0000" 
+                                placeholder="000-0000-0000-0000"
+                                (click)="resetaAlert()"
+                                (keyup)="validaCartaoSus()"
+                            >                                
+                        </div>                            
+                    </div> 
+
+                    <button 
+                        type="button"
+                        class="btn btn-success"
+                        (click)="buscarPacViaBotao()"
+                        [disabled]="!cartaoSusValido"
+                    >
+                        Buscar
+                        <i class="fa fa-search"></i>
+                    </button>
+                    <!-- INICIO DA BUSCA DO PACIENTE -->              
+
+                </div>
+            </div>                
+        </div>
+    </div>        
+    <!-- BUSCAR CARTÃO SUS CASO NAO VENHA COMO PARAMETRO -->    
+
+    <!-- CARD PARA CARTAO DA URL INVALIDO  -->
+    <div class="row" *ngIf="cartaoSusURL==='invalido' && !flagFalhaReqURL">
+        <div class="col-lg-12">
+            
+            <div class="card">
+                <div class="card-header">
+                    Falha de comunicação <i class="fa fa-exclamation-triangle"></i>
+                </div>
+
+                <div class="card-body">
+                    <div class="alert alert-danger" role="alert">
+                        <p> O cartão do sus <strong> {{ cartaoSusURL }} </strong> informado na URL não é válido! </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- CARD PARA CARTAO DA URL INVALIDO  -->    
+
+    <!-- CARD PARA CARTAO DA URL NAO ENCONTRADO  -->
+    <div 
+    class="row" 
+    *ngIf="cartaoSusURL!==undefined && !flagFalhaReqURL && cartaoSusURL !== 'invalido' && paciente===undefined"
+    >
+    <div class="col-lg-12">
+        
+        <div class="card">
+            <div class="card-header">
+                    <span class="tituloTabela"> Dados do paciente  </span>
+                <i class="fa fa-address-card-o"></i>
+            </div>
+
+            <div class="card-body">
+                <div class="alert alert-warning" role="alert">
+                        <p> O paciente com cartão do sus <strong> {{ cartaoSusURL }} </strong> não está cadastrado no sistema! </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+    <!-- CARD PARA CARTAO DA NAO ENCONTRADO  -->   
+    
+    <!-- EXIBINDO OS DADOS DO PACIENTE PARA CONFERÊNCIA DO USUARIO -->
+    <div class="row">
+        <div class="col-lg-12">
+
+            <!-- CARD COM DETALHES DO PACIENTE SE ELE FOI ENCONTRADO -->
+            <div class="card" *ngIf="paciente !== undefined">
+                <div class="card-header">
+                    <i class="fa fa-address-card-o"></i>
+                    <span class="tituloTabela"> Dados do paciente </span>
+                    <!-- POPOVER SOBRE O PACIENTE -->                         
+                    <button 
+                        class="btn btn-info btn-sm" 
+                        placement="right" 
+                        popover="Caso este não seja o paciente que você deseja inserir uma lesão, por favor, corrija o valor do cartão do sus ou busque por outro paciente" 
+                        type="button">
+                        <i class="fa fa-comment"></i>
+                    </button>                        
+                    <!-- POPOVER SOBRE O PACIENTE -->                 
+                </div>
+
+                <div class="card-body">                        
+                    <strong> Cartão SUS: </strong> {{paciente.cartaoSus}} <br/>                    
+                    <strong> Lesões cadastradas para o paciente: </strong> {{ paciente.lesoes.length }} <br/>
+                </div>
+
+            </div>
+            <!-- CARD COM DETALHES DO PACIENTE SE ELE FOI ENCONTRADO -->
+        </div>  
+    </div>
+    <!-- EXIBINDO OS DADOS DO PACIENTE PARA CONFERÊNCIA DO USUARIO --> 
+    
+    <!--######################################################################################################################-->
+        <!--############################## AQUI COMEÇA A INCLUSÃO DA LESÃO DE FATO ###############################################-->
+        <!--######################################################################################################################-->
+
+        <div class="row" *ngIf="paciente != undefined && !flagFalhaReqURL">
+            <div class="col-lg-12">
+                
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fa fa-medkit"></i>
+                        <span class="tituloTabela"> Adicionando lesões </span>                                           
+                    </div>
+
+
+                    <div class="card-body">
+
+                        <div *ngIf="respUsuario === 'pac-salvo' " class="alert alert-success text-center" role="alert">
+                            
+                                A lesão com diagnóstico <strong> {{ lesao.diagnostico }} </strong> contendo <strong> {{ imagens.length }} imagens </strong> foi 
+                                adicionada ao paciente <strong> {{ paciente.cartaoSus }} </strong>
+                            
+                        </div>
+
+                        <div *ngIf="respUsuario === 'erro-salvar-pac' " class="alert alert-danger" role="alert">
+                            <p> 
+                                Houve um problema ao salvar a lesão para o paciente adicionada ao paciente <strong> {{ paciente.cartaoSus }} </strong>. Por favor,
+                                tente mais tarde. Caso o erro persista, entre em contato com os desenvolvedores.
+                            </p>
+                        </div>
+                        
+                        <!-- FORM INSERÇÃO DA LESÃO -->
+                        <form
+                        #dadosLesao="ngForm" 
+                        (ngSubmit)="recebeDadosLesao()"
+                        >
+
+                            <!-- LINHA 1 DO FORM DE LESAO -->
+                            <div class="row">
+
+                                <!-- DIAGNOSTICO CLINICO -->
+                                <div class="form-group col-sm-4">
+                                    <label for="diagCli">Diagnóstico clínico*: </label>
+                                    <div>
+                                        <input 
+                                            type="text" 
+                                            id="diagCli"
+                                            class="form-control"                                        
+                                            ngModel
+                                            name="diagnostico"
+                                            #diagCli="ngModel"
+                                            [ngbTypeahead]="completarDiagnostico"  
+                                            minlength="3"
+                                            required                                   
+                                        >
+                                        <small 
+                                            *ngIf="diagCli.invalid && diagCli.touched" 
+                                            class="form-text text-danger">
+                                                Diagnóstico clínico é obrigatório
+                                        </small>
+                                    </div>
+                                </div>
+                                <!-- DIAGNOSTICO CLINICO -->
+
+                                <!-- DIAGNOSTICO SECUNDARIO -->
+                                <div class="form-group col-sm-4">
+                                    <label for="diagCli2">Diagnóstico clínico secundário: </label>
+                                    <div>
+                                        <input 
+                                            type="text" 
+                                            id="diagCli2"
+                                            class="form-control"                                        
+                                            ngModel
+                                            name="diagnosticoSecundario"
+                                            minlength="3"
+                                            [ngbTypeahead]="completarDiagnostico"                                                                               
+                                        >                                
+                                    </div>
+                                </div>
+                                <!-- DIAGNOSTICO SECUNDARIO -->
+
+                                <!-- REGIAO -->
+                                <div class="form-group col-sm-4">
+                                    <label for="regiao">Região da lesão*: </label>
+                                    <div>
+                                        <input 
+                                            type="text" 
+                                            id="regiao"
+                                            class="form-control"                                        
+                                            ngModel
+                                            name="regiao"
+                                            #regiao="ngModel"
+                                            [ngbTypeahead]="completarRegiao"    
+                                            minlength="2"
+                                            required                                                                            
+                                        >                                
+                                    </div>
+                                    <small 
+                                        *ngIf="regiao.invalid && regiao.touched" 
+                                        class="form-text text-danger">
+                                            Região da lesão obrigatório
+                                    </small>
+                                </div>
+                                <!-- REGIAO -->                                
+                                    
+                            </div>
+                            <!-- LINHA 1 DO FORM DE LESAO -->     
+                            
+                            <!-- LINHA 2 DO FORM DE LESAO -->
+                            <div class="row">
+
+                                <!-- CRESCEU -->
+                                <div class="form-group col-sm-2">
+                                    <label for="cresceu">Creceu? </label>
+                                    <div>
+                                        <label class="switch switch-label switch-primary">
+                                            <input 
+                                                type="checkbox" 
+                                                class="switch-input"                                                 
+                                                ngModel
+                                                name="cresceu"
+                                            >
+                                            <span 
+                                                class="switch-slider" 
+                                                data-checked="Sim" 
+                                                data-unchecked="Não">
+                                            </span>
+                                        </label>                              
+                                    </div>
+                                </div>
+                                <!-- CRESCEU -->
+
+                                <!-- COÇOU -->
+                                <div class="form-group col-sm-2">
+                                    <label for="cocou">Coçou? </label>
+                                    <div>
+                                        <label class="switch switch-label switch-primary">
+                                            <input 
+                                                type="checkbox" 
+                                                class="switch-input"                                                 
+                                                ngModel
+                                                name="cocou"
+                                            >
+                                            <span 
+                                                class="switch-slider" 
+                                                data-checked="Sim" 
+                                                data-unchecked="Não">
+                                            </span>
+                                        </label>                              
+                                    </div>
+                                </div>
+                                <!-- COÇOU -->  
+                                
+                                <!-- SANGROU -->
+                                <div class="form-group col-sm-2">
+                                    <label for="sangrou">Sangrou? </label>
+                                    <div>
+                                        <label class="switch switch-label switch-primary">
+                                            <input 
+                                                type="checkbox" 
+                                                class="switch-input"                                                 
+                                                ngModel
+                                                name="sangrou"
+                                            >
+                                            <span 
+                                                class="switch-slider" 
+                                                data-checked="Sim" 
+                                                data-unchecked="Não">
+                                            </span>
+                                        </label>                              
+                                    </div>
+                                </div>
+                                <!-- SANGROU -->      
+                                
+                                <!-- DOEU -->
+                                <div class="form-group col-sm-2">
+                                    <label for="doeu">Doeu? </label>
+                                    <div>
+                                        <label class="switch switch-label switch-primary">
+                                            <input 
+                                                type="checkbox" 
+                                                class="switch-input"                                                 
+                                                ngModel
+                                                name="doeu"
+                                            >
+                                            <span 
+                                                class="switch-slider" 
+                                                data-checked="Sim" 
+                                                data-unchecked="Não">
+                                            </span>
+                                        </label>                              
+                                    </div>
+                                </div>
+                                <!-- DOEU --> 
+                                
+                                <!-- MUDOU PADRAO -->
+                                <div class="form-group col-sm-2">
+                                    <label for="mudou">Mudou padrão? </label>
+                                    <div>
+                                        <label class="switch switch-label switch-primary">
+                                            <input 
+                                                type="checkbox" 
+                                                class="switch-input"                                                 
+                                                ngModel
+                                                name="mudou"
+                                            >
+                                            <span 
+                                                class="switch-slider" 
+                                                data-checked="Sim" 
+                                                data-unchecked="Não">
+                                            </span>
+                                        </label>                              
+                                    </div>
+                                </div>
+                                <!-- MUDOU PADRAO -->
+
+                                <!-- RELEVO -->
+                                <div class="form-group col-sm-2">
+                                    <label for="relevo">Em relevo? </label>
+                                    <div>
+                                        <label class="switch switch-label switch-primary">
+                                            <input 
+                                                type="checkbox" 
+                                                class="switch-input"                                                 
+                                                ngModel
+                                                name="relevo"
+                                            >
+                                            <span 
+                                                class="switch-slider" 
+                                                data-checked="Sim" 
+                                                data-unchecked="Não">
+                                            </span>
+                                        </label>                              
+                                    </div>
+                                </div>
+                                <!-- RELEVO -->                                
+                                
+                            </div>
+                            <!-- LINHA 2 DO FORM DE LESAO -->
+                            
+                            <!-- LINHA 3 DO FORM DE LESAO -->
+                            <div class="row">
+
+                                <!-- REGIAO -->
+                                <div class="form-group col-sm-3">
+                                    <label for="idade">Idade do paciente*: </label>
+                                    <div>
+                                        <input 
+                                            type="number" 
+                                            id="idade"
+                                            class="form-control"                                        
+                                            ngModel
+                                            name="idade"
+                                            #idade="ngModel"
+                                            required                                                                            
+                                        >                                
+                                    </div>
+                                    <small 
+                                        *ngIf="idade.invalid && idade.touched" 
+                                        class="form-text text-danger">
+                                            Idade do paciente obrigatório
+                                    </small>
+                                </div>
+                                <!-- REGIAO --> 
+
+                                <!-- OBSERVACAO -->
+                                <div class="form-grup col-sm-5">
+                                    <label for="obs">Observação: </label>
+                                    <div>
+                                        <input 
+                                            type="text" 
+                                            id="obs"
+                                            class="form-control"                                        
+                                            ngModel
+                                            name="obs"                                                                                                                     
+                                        >                                
+                                    </div> 
+                                </div>
+                                <!-- OBSERVACAO -->
+
+                                <!-- IMAGEM -->
+                                <div class="form-group col-sm-4">
+                                    <label for="imagem">Enviar imagens*: </label>
+                                    <div>
+                                        <input 
+                                            type="file" 
+                                            id="imagem"
+                                            #inputFile
+                                            class="form-control-file" 
+                                            multiple                                            
+                                            (change)="recebeImagensInput($event)"                                            
+                                        >                                
+                                    </div>
+                                    <small 
+                                        *ngIf="!imgValida && imgValida!== undefined && respUsuario!=='imagem-grande'" 
+                                        class="form-text text-danger">
+                                            Você está submentendo um arquivo que não é uma imagem!
+                                    </small>
+                                    <small 
+                                        *ngIf="!imgValida && imgValida!== undefined && respUsuario==='imagem-grande'" 
+                                        class="form-text text-danger">
+                                            A imagem que você está submetendo é maior do que 10mb. Redimensione a imagem!
+                                    </small>
+                                    <small 
+                                        *ngIf="imagensForm !== undefined" 
+                                        class="form-text text-success">
+                                            {{ imagensForm.length }} imagens foram adicionadas
+                                    </small>
+                                </div>
+                                <!-- IMAGEM -->                                
+                            </div>
+                            <!-- LINHA 3 DO FORM DE LESAO -->
+
+                            
+                            <!-- BOTAO DE ENVIO -->
+                            <div class="form-group" style="margin-top: 15px;">
+                                <button
+                                    type="submit"
+                                    [disabled]="dadosLesao.invalid || imgValida === false || imagensFile === undefined"
+                                    class="btn btn-success btn-lg"
+                                >
+                                Enviar
+                                <i class="fa fa-send"></i>
+                                </button>
+                            </div>
+                            
+                            <!-- BOTAO DE ENVIO -->                            
+
+
+                        </form>
+
+                </div>
+
+            </div>
+        </div>
+
+    
+
+
+
+</div>

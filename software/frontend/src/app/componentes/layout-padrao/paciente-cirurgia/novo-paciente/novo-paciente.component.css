@@ -1,0 +1,33 @@
+.ng-invalid.ng-touched:not(form) {
+    border: 1px solid red;
+}
+
+.ng-valid.ng-touched:not(form) {
+    border: 1px solid green;
+}
+
+.invalido {
+    font-size: 0.8em;
+    padding: 2px;
+    color: red;
+}
+
+.susInvalido {
+    border: 1px solid red;
+}
+
+#botaoCadastrar{
+    margin-top: 20px;
+}
+
+.btn-info {
+    color: #FFF;    
+} 
+
+.btn-sm{    
+    margin-left: 5px;
+}
+
+input[type=radio]{
+    transform:scale(1.6);
+}

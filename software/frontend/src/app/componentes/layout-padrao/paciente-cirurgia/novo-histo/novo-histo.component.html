@@ -1,0 +1,719 @@
+<div class="animated fadeIn">
+  
+   <!-- CARD PARA CASO DE FALHA NA REQUISICAO  -->
+    <div class="row" *ngIf="flagFalhaReq">
+      <div class="col-lg-12">
+          <div class="card">
+              <div class="card-header">
+                  <span> <strong>Falha de comunicação</strong><i class="fa fa-exclamation-triangle"></i> </span>                        
+              </div>
+
+              <div class="card-body">
+                  <div class="alert alert-danger text-center" role="alert">
+                      Infelizmente ocorreu uma falha de comunicação. Tente acessar mais tarde. Caso persista, entre em contato
+                      com os desenvolvedores.
+                  </div>
+              </div>
+          </div>
+      </div>
+    </div>
+    <!-- CARD PARA CASO DE FALHA NA REQUISICAO  -->
+
+   <!-- CARD CARTAO VIA URL   -->
+    <div class="row" *ngIf="!flagFalhaReq && isRequisicaoURL && !possuiLesaoSemHisto">
+      <div class="col-lg-12">
+          <div class="card">
+            <div class="card-header">
+              <i class="fa fa-search"></i> 
+              <span><strong>Buscar paciente</strong></span>
+            </div>
+
+            <div class="card-body">
+              <div *ngIf="!cartaoSusValido && cartaoSusURL === 'invalido'" class="alert alert-danger text-center" role="alert">
+                <strong> O cartão informado na URL não é válido! </strong>
+              </div>
+
+              <!-- Informa ao usuario que o paciente já possui todos os histopatológicos registrados -->
+              <div *ngIf="!possuiLesaoSemHisto && cartaoSusURL !== 'invalido' && cartaoSusValido && !pacienteNaoEncontrado" class="alert alert-success text-center" role="alert">
+                    O(a) Paciente <strong> {{nomePaciente}} </strong> não possui nenhuma histopatológico para ser preenchido.
+              </div>
+
+              <!-- Informa ao usuario que o paciente não esta cadastardo -->
+              <div *ngIf="pacienteNaoEncontrado " class="alert alert-warning text-center" role="alert">
+                  O(a) paciente de cartão SUS <strong>{{cartaoSusURL}}</strong> não está cadastrado no sistema. 
+              </div>
+
+              {{ lesoes | json}}
+
+            </div>
+          </div>
+      </div>
+    </div>
+   <!-- CARD CARTAO VIA URL  -->
+
+
+   <!--CARD CARTAO SUS VIA INPUT-->  
+    <div class="row" *ngIf = "!flagFalhaReq && !isRequisicaoURL">
+      <div class ="col-md-12">
+        <div class="card" >
+          
+          <div class="card-header">
+            <i class="fa fa-search"></i> 
+            <span><strong>Buscar paciente</strong></span>
+          </div>
+          
+          <div class ="card-body ">
+                <!-- CABEÇALHO DO CADASTRO -->
+                  <form >
+                    <!-- Inform the user that the spring returned an error and could not find the pacient -->
+                    <div *ngIf="pacienteNaoEncontrado" class="alert alert-warning text-center" role="alert">
+                        O(a) paciente de cartão SUS <strong>{{ cartaoSUS }}</strong> não está cadastrado no sistema.
+                    </div>
+                    
+                    <!-- Informa ao usuario que o paciente já possui todos os histopatológicos registrados -->
+                    <div *ngIf="!possuiLesaoSemHisto && !pacienteNaoEncontrado" class="alert alert-success text-center" role="alert">
+                        O(a) Paciente {{nomePaciente}} não possui nenhuma histopatológico para ser preenchido.
+                    </div>
+                    
+                    <div class ="form-row" >
+                        <!-- FORMGROUP - CARTAO SUS -->
+                          <div class="form-group col-md-6" >
+                            <label for="cartaoSus">Cartão SUS:
+                                <button 
+                                  class="btn btn-info btn-sm" 
+                                  placement="right" 
+                                  popover="Para inserir um diagnóstico histopatológico, primeiro você deve informar o paciente." 
+                                  type="button">
+                                  <i class="fa fa-question"></i>
+                                </button>  
+                            </label>
+                            <div class="input-group">
+                                <!-- INPUT  CARTAO SUS -->
+                                <input 
+                                  id = "cartaoSus"
+                                  type="text"
+                                  class="form-control"                     
+                                  name="cartaoSus" 
+                                  ngModel
+                                  #cartaoSus="ngModel"
+                                  [dropSpecialCharacters]="false"
+                                  mask="000-0000-0000-0000"
+                                  placeholder="000-0000-0000-0000"
+                                  [(ngModel)]="cartaoSusForm"
+                                  (keyup) = "validaCartaoSus()">
+                                  <!-- INPUT CARTAO SUS -->
+
+                                  <div class="input-group-append">
+                                    <span class="input-group-text"><i class="fa fa-address-card-o"></i></span>
+                                  </div>
+                            </div>
+                          </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="text-left form-group col-md-4" >
+                            <!-- BUTTON SUBMISSAO -->
+                            <button 
+                              type="button" 
+                              class="btn btn-success btn-lg"
+                              (click)="buscarPacienteCartao()"
+                              [disabled]="!cartaoSusValido">
+                              Buscar
+                              <i class="fa fa-search"></i>
+                            </button>
+                            <!-- BUTTON SUBMISSAO -->
+                        </div>  
+                    </div>
+                  </form>
+                <!-- FIM CABEÇALHO DO CADASTRO -->
+            </div>
+        </div>
+      </div>
+    </div>
+  <!--FIM CARD CARTAO SUS VIA INPUT-->
+
+  <!--TABELA COM LESOES SEM HISTOPATOLOGICO E CADASTRO DO HISTO-->
+   <div class="row" *ngIf="(possuiLesaoSemHisto && lesoesSemHisto.length > 0) || (lesaoAtualizada && !lesaoSelecionada && lesaoEnviada) && !pacienteNaoEncontrado">
+    <div class ="col-md-12">
+
+      <div class="card"  >
+        <div class="card-header">
+            <i class="fa fa-th-list"></i> 
+            <span class="tituloTabela"> <strong> Lista de lesões sem histopatológico </strong></span>
+        </div>
+
+        
+
+        <div class="card-body">  
+            <div class="alert alert-danger text-center" role="alert" *ngIf="!lesaoAtualizada && !lesaoEnviada">
+                  Dados da lesão com diagnostico clínico <strong>{{ diagnosticoCliAtual }}</strong> na  região <strong>{{ regiaoAtual }}</strong> não foram atualizados. Tente novamente ou escolha outra lesão. Caso o erro persista, entre em contato com os desenvolvedores.
+            </div>
+            <div class="alert alert-success text-center" role="alert" *ngIf="lesaoAtualizada && !lesaoSelecionada && lesaoEnviada">            
+                 Os dados histopatológicos da lesão de diagnóstico clinico <strong>{{ diagnosticoCliAtual }}</strong> na  região <strong>{{ regiaoAtual }} </strong>foram atualizados com sucesso.
+            </div>
+            <div  class="table-responsive">
+            <table class="table table-striped" *ngIf="possuiLesaoSemHisto && lesoesSemHisto.length > 0">                            
+                    <thead>
+                        <tr>
+                            <th scope ="col">Nome</th>
+                            <th scope = "col">Diagnóstico Clinico</th>
+                            <th scope ="col">Região da Lesão</th>
+                            <th scope ="col">Cadastrar Histopatológico</th>
+                        </tr>
+                    </thead>
+
+                    <tbody *ngFor=" let lesao of lesoesSemHisto">
+                        <tr scope ="row">
+                            <td>{{ nomePaciente }}</td>
+                            <td>{{ lesao.diagnosticoClinico }}</td>
+                            <td>{{ lesao.regiao }}</td>                                  
+                            <td>
+                                    <button
+                                        type="button"
+                                        class="btn btn-success"
+                                        (click) = "cadastrarHisto(lesao.diagnosticoClinico, lesao.regiao, lesao._links.self.href)">
+                                        <i class="fa fa-pencil"></i>
+                                    </button>
+                            </td>
+                        </tr>
+                    </tbody>
+            </table>
+            </div>
+        </div>
+</div>
+<!--FIM TABELA LESOES SEM HISTOPATOLÓGICO-->
+
+      <!--CARD PARA FORM DO HISTOPATOLOGICO-->
+      <div class="card"  *ngIf="lesaoSelecionada && possuiLesaoSemHisto">
+          
+          <div class="card-header">
+              <i class="fa fa-file-text-o"></i> 
+              <span> <strong>Dados Histopatológicos</strong>
+                  <button 
+                  class="btn btn-info btn-sm" 
+                  placement="right" 
+                  popover="Insira os dados da lesão selecionada. Se o resultado for carcinoma basocelular, espinocelular ou melanoma, mais opções vão aparecer na tela" 
+                  type="button">
+                  <i class="fa fa-question"></i>
+                  </button>
+              </span> 
+              
+          </div>  
+                  <!--CORPO DO CADASTRO-->
+                  <div class="card-body">
+                      <form 
+                        #dadosCadastroForm="ngForm"
+                        (ngSubmit)="recebeCadastroForm()">
+                                     
+                      <!--FORM ROW 1-->
+                      <div class ="form-row">
+
+                            <!-- FORMGROUP DIAGNOSTICO HISTOPATOLOGICO -->
+                            <div class="form-group col-md-12">
+                              <label for="diagnostico">Diagnóstico Histopatológico*: </label> 
+                              <div class="input-group">
+                                  <!-- INPUT  DIAGNOSTICO HISTOPATOLOGICO -->
+                                  <input 
+                                    id = "diagnostico"
+                                    type="text"
+                                    class="form-control"                     
+                                    name="diagnosticoHistopatologico"
+                                    ngModel
+                                    minlength=3
+                                    #diagnosticoHistopatologico="ngModel" 
+                                    [ngbTypeahead]="completarDiagnostico"
+                                    required
+                                    (change)= "opcoesMelanoma()">
+                                  <!-- INPUT DIAGNOSTICO HISTOPATOLOGICO -->
+                              </div>
+
+                              <div *ngIf="!diagnosticoHistopatologico.valid && diagnosticoHistopatologico.touched" class=" form-text text-danger">
+                                Diagnóstico obrigatório.
+                              </div>
+
+                            </div>
+                        </div>
+                    
+                    <!--INICIO INFS EXTRA DIAGNOSTICO-->
+                    <div *ngIf="isMelanoma || isCarcinomaBaso || isCarcinomaEspin">
+                      
+                      <!--INFORMACOES EM COMUM TODOS DIAGS-->
+                      <div class="form-row">
+                          <div class="form-group col-md-6">
+                              <label for="subtipoHistopatologico">Subtipo Histopatológico: </label>
+                              <div class="input-group">
+                                  <!-- INPUT SUBTIPO HISTOPATOLOGICO -->
+                                  <input 
+                                    type="text" 
+                                    class="form-control"
+                                    name="subtipoHistopatologico"
+                                    ngModel 
+                                    #subtipoHistopatologico="ngModel"
+                                    [ngbTypeahead]="completarSubtipoHisto"
+                                    minlength=3
+                                    required>
+                                  <!-- INPUT SUBTIPO HISTOPATOLOGICO -->
+                              </div>
+                
+                              <div *ngIf="!subtipoHistopatologico.valid && subtipoHistopatologico.touched" class="invalido">
+                                Subtipo do histopatológico obrigatório.
+                              </div>
+                          </div>
+
+                          <!-- FORMGROUP - CLARK -->
+                          <div class="form-group col-md-6">
+                            <label for="clark">Clark: </label>
+                            <div class="input-group" >
+                                <div class="col-form-label">
+                                        <div class="form-check form-check-inline mr-4">
+                                                <input type="radio" id="I" class= "clark-check-box" name="clark" value="I OU IN SITU " ngModel #clark=ngModel required>
+                                                <label class="form-check-label" for="I">I OU IN SITU</label>
+                                        </div>
+                                        <div class="form-check form-check-inline mr-4">
+                                                <input type="radio" id="II" class= "clark-check-box" name="clark" value="II" ngModel #clark=ngModel required>
+                                                <label class="form-check-label" for="II">II</label>
+                                        </div>
+                                        <div class="form-check form-check-inline mr-4">
+                                                <input type="radio" id="III" class= "clark-check-box" name="clark" value="III" ngModel #clark=ngModel required>
+                                                <label class="form-check-label" for="III">III</label>
+                                        </div>
+                                        <div class="form-check form-check-inline mr-4">
+                                                <input type="radio" id ="I4" class= "clark-check-box" name="clark" value="IV" ngModel #clark=ngModel required>
+                                                <label class="form-check-label" for="I4">IV</label>
+                                        </div>
+                                         <div class="form-check form-check-inline mr-4">
+                                                <input type="radio" ID="V" class= "clark-check-box" name="clark" value="V" ngModel #clark=ngModel required> 
+                                                <label class="form-check-label" for="V">V</label>
+                                        </div>
+                                        <div class="form-check form-check-inline mr-4">
+                                            <input type="radio" id ="NF" class= "clark-check-box" name="clark" value="NF" ngModel #clark=ngModel required>
+                                                <label class="form-check-label" for="NF">NÃO INFORMADO</label>
+                                        </div>
+                                </div>
+                            </div>
+              
+                          <div *ngIf="!clark.valid && clark.touched" class="invalido">
+                              Selecione uma opção
+                            </div>
+              
+                          </div>     
+                      </div>
+
+                      <!--INFS EM COMUM CARCINOMA-->
+                      <div class="form-row" *ngIf="isCarcinomaEspin || isCarcinomaBaso">
+                        <!-- FORMGROUP - LIMITES DE RESSECAO -->
+                        <div class="form-group col-md-12">
+                            <label for="limiteRessecao">Limites de resseção: </label>
+                            <div class="input-group">
+                                <!-- INPUT LIMITES DE RESSECAO -->
+                                <select name="limiteRessecao" required class="form-control" ngModel #limiteRessecao = "ngModel">
+                                    <option value="NF"  selected>NÃO INFORMADO</option>
+                                    <option value="LCN">LIVRES DE COMPROMETIMENTO NEOPLÁSICO</option>
+                                    <option value="CML">COMPROMETIDO NA MARGEM LATERAL</option>
+                                    <option value="CMP"> COMPROMETIDO NA MARGEM PROFUNDA</option>
+                                    <option value="CMPL"> COMPROMETIDO NA MARGEM PROFUNDA E LATERAL</option>
+                                </select>
+                                <br><br>
+                                <!-- INPUT LIMITES DE RESSECAO -->
+                            </div>
+                            <div *ngIf="limiteRessecao.invalid && limiteRessecao.touched" class="invalido">
+                              Selecione uma opção
+                            </div>
+                          </div>
+                      </div>
+
+                      <!--INFS CARCINOMA ESPINOCELULAR-->
+                      <div class="form-row" *ngIf="isCarcinomaEspin">
+                          <!-- FORMGROUP - INFILTRAÇÃO PERINEURAL -->
+                          <div class="form-group col-md-6">
+                              <label for="infiltracaoPerineural">Infiltração Perineural: </label>
+                              <div class="input-group">
+                                  <!-- INPUT INFILTRAÇÃO PERINEURAL -->
+                                  <select name="infiltracaoPerineural" required class="form-control" ngModel #infiltracaoPerineural = "ngModel">
+                                      <option value="NF" selected>NÃO INFORMADO</option>
+                                      <option value="PRESENTE">PRESENTE</option>
+                                      <option value="AUSENTE">AUSENTE</option>
+                                  </select>
+                                  <br><br>
+                                  <!-- INPUT INFILTRAÇÃO PERINEURAL -->
+                              </div>
+                            </div>
+
+                            <div class="form-group col-md-6">
+                                <label for="infiltracaoAngiolinfatica">Infiltração Angiolinfática: </label>
+                                <div class="input-group">
+                                    <!-- INPUT INFILTRAÇÃO ANGIOLINFÁTICA -->
+                                    <select name="infiltracaoAngiolinfatica" required class="form-control" ngModel #infiltracaoAngiolinfatica = "ngModel">
+                                        <option value="NF" selected>NÃO INFORMADO</option>
+                                        <option value="PRESENTE">PRESENTE</option>
+                                        <option value="AUSENTE">AUSENTE</option>
+                                    </select>
+                                    <br><br>
+                                    <!-- INPUT INFILTRAÇÃO ANGIOLINFÁTICA-->
+                                </div>
+                              </div> 
+                        </div>
+                        
+                        <div class="form-row" *ngIf="isCarcinomaEspin">
+                          <div class="form-group col-md-6">
+                            <label for="tamanhoTumorDimMaior">Tamanho do tumor (mm): </label> 
+                            <div class="input-group">
+                                <!-- INPUT  TAMANHO TUMOR -->
+                                <input 
+                                  id = "tamanhoTumorDimMaior"
+                                  type="number"
+                                  class="form-control"                     
+                                  name="tamanhoTumorDimMaior"
+                                  ngModel
+                                  #tamanhoTumorDimMaior="ngModel" 
+                                  required
+                                >
+                                <!-- INPUT  TAMANHO TUMOR -->
+                            </div>
+                            <div *ngIf="!tamanhoTumorDimMaior.valid && tamanhoTumorDimMaior.touched" class="invalido">
+                              Tamanho do tumor obrigatório.
+                            </div>
+                          </div>
+                        </div>
+                    
+                    <!--INFS APENAS MELANOMA-->
+                    <div *ngIf="isMelanoma">
+                      
+                      <!-- INICIO ROW 1 MELANOMA-->
+                      <div class="form-row">
+                        
+                        <!-- FORMGROUP - TIPO TUMOR -->
+                        <div class="form-group col-md-4"  >
+                          <label for="tipoTumor">Tipo Tumor: </label>
+                          <div class="input-group">
+                              <!-- INPUT TIPO TUMOR -->
+                              <select name="tipoTumor" required class="form-control" ngModel #tipoTumor = "ngModel">
+                                <option value="INVASIVO" selected>INVASIVO</option>
+                                <option value="IN SITU">IN SITU</option>
+                            </select>
+                            <!-- INPUT TIPO TUMOR-->
+                          </div>
+                        </div>
+
+                         <!-- FORMGROUP - BRESLOW -->
+                         <div class="form-group col-md-4"  >
+                          <label for="breslow">Breslow(mm): </label>
+                          <div class="input-group">
+                              <!-- INPUT BRESLOW -->
+                                <input 
+                                  type="number" 
+                                  class="form-control"
+                                  name="breslow"
+                                  ngModel 
+                                  #breslow="ngModel"
+                                  step="0.1"
+                                  required>
+                              <!-- INPUT BRESLOW -->
+                          </div>
+                        </div>
+
+                         
+                              <!-- FORMGROUP - TAMANHO TUMOR -->
+                              <div class="form-group col-md-2" >
+                                <label for="tamanhoTumorDimMaior"> Tamanho tumor(mm): </label>
+                                <div class="input-group">
+                                    <!-- INPUT TAMANO TUMOR -->
+                                      <input 
+                                        type="number" 
+                                        class="form-control"
+                                        name="tamanhoTumorDimMaior"
+                                        ngModel 
+                                        #tamanhoTumorDimMaior="ngModel"
+                                        placeholder="Diâmetro maior"
+                                        required>
+
+
+                                    <!-- INPUT TAMANHO TUMOR -->
+                                </div>
+                              </div>
+
+                              <!-- FORMGROUP - TAMANHO TUMOR -->
+                              <div class="form-group col-md-2" >
+                                  <label for="tamanhoTumorDimMenor"> Tamanho tumor(mm): </label>
+                                <div class="input-group">
+                                    <!-- INPUT TAMANO TUMOR -->
+                                      <input 
+                                        type="number" 
+                                        class="form-control"
+                                        name="tamanhoTumorDimMenor"
+                                        ngModel 
+                                        #tamanhoTumorDimMenor="ngModel"
+                                        placeholder="Diâmetro menor"
+                                        required>
+                                    <!-- INPUT TAMANHO TUMOR -->
+                                </div>
+                              </div>
+                      
+                      
+                      </div>
+                      <!--FIM ROW 1 MELANOMA-->
+
+                      <!--INICIO FORM ROW 2 MELANOMA-->
+                      <div class="form-row">
+                        
+                        <!-- FORMGROUP - CRESCIMENTO RADIAL -->
+                        <div class="form-group col-md-3"  >
+                          <label for="crescimentoRadial">Fase de Crescimento Radial: </label>
+                          <div class="input-group">
+                              <!-- INPUT CRESCIMENTO RADIAL -->
+                              <select name="crescimentoRadial" required class="form-control" ngModel #crescimentoRadial = "ngModel">
+                                  <option value="NSA" selected>NÃO SE APLICA</option>
+                                <option value="PRESENTE" selected>PRESENTE</option>
+                                <option value="AUSENTE">AUSENTE</option>
+                            </select>
+                            <!-- INPUT CRESCIMENTO RADIAL-->
+                          </div>
+                        </div>
+
+                        <!-- FORMGROUP - CRESCIMENTO VERTICAL -->
+                        <div class="form-group col-md-3"  >
+                            <label for="crescimentoVertical">Fase de Crescimento vertical: </label>
+                            <div class="input-group">
+                                <!-- INPUT CRESCIMENTO VERTICAL -->
+                                <select name="crescimentoVertical" required class="form-control" ngModel #crescimentoVertical = "ngModel">
+                                    <option value="NSA" selected>NÃO SE APLICA</option>
+                                  <option value="PRESENTE" selected>PRESENTE</option>
+                                  <option value="AUSENTE">AUSENTE</option>
+                              </select>
+                              <!-- INPUT CRESCIMENTO VERTICAL-->
+                            </div>
+                        </div>
+
+                          <!-- FORMGROUP - INDICE MIOTICO -->
+                          <div class="form-group col-md-3" >
+                              <label for="indiceMiotico">Índice mitótico: </label>
+                              <div class="input-group">
+                                  <!-- INPUT INDICE MIOTICO -->
+                                    <input 
+                                      type="number" 
+                                      class="form-control"
+                                      name="indiceMiotico"
+                                      placeholder="mitoses/mm²"
+                                      ngModel 
+                                      #breslow="ngModel"
+                                      required>
+                                  <!-- INPUT INDICE MIOTICO -->
+                              </div>
+                          </div>
+
+                           <!-- FORMGROUP - INFILTRADO INFLAMATÓRIO LINFOCÍTICO -->
+                        <div class="form-group col-md-3"  >
+                            <label for="infiltradoLinfocito">Infiltrado inflamatório Linfócito: </label>
+                            <div class="input-group">
+                                <!-- INPUTINFILTRADO INFLAMATÓRIO LINFOCÍTICO -->
+                                <select name="infiltradoLinfocito" required class="form-control" ngModel #infiltradoLinfocito = "ngModel">
+                                    <option value="NF" selected>NÃO INFORMADO</option>
+                                  <option value="PRESENTE" selected>PRESENTE</option>
+                                  <option value="AUSENTE">AUSENTE</option>
+                              </select>
+                              <!-- INPUT INFILTRADO INFLAMATÓRIO LINFOCÍTICO-->
+                            </div>
+                        </div>
+
+                      </div>
+                      <!--FIM FORM ROW 2 MELANOMA-->
+
+                       <!--INICIO FORM ROW 3 MELANOMA-->
+                       <div class="form-row">
+                          
+                        <!-- FORMGROUP - ULCERACAO -->
+                        <div class="form-group col-md-3"  >
+                                <label for="ulceracao">Ulceração: </label>
+                                <div class="input-group">
+                                  <!-- INPUT  ULCERACAO -->
+                                  <select name="ulceracao" required class="form-control" ngModel #ulceracao = "ngModel">
+                                    <option value="NF" selected>NÃO INFORMADO</option>
+                                    <option value="PRESENTE" selected>PRESENTE</option>
+                                    <option value="AUSENTE">AUSENTE</option>
+                                  </select>
+                                  <!-- INPUT ULCERACAO-->
+                                </div>
+                              </div>
+                              
+                              <!-- FORMGROUP - lesaoSatelite -->
+                              <div class="form-group col-md-3" >
+                                <label for="lesaoSatelite">Lesão Satelite: </label>
+                                <div class="input-group">
+                                    <!-- INPUT lesaoSatelite -->
+                                    <select name="lesaoSatelite" required class="form-control" ngModel #lesaoSatelite = "ngModel">
+                                        <option value="NF" selected>NÃO INFORMADO</option>
+                                      <option value="PRESENTE" selected>PRESENTE</option>
+                                      <option value="AUSENTE">AUSENTE</option>
+                                  </select>
+                                    <!-- INPUT INDICE lesaoSatelite -->
+                                </div>
+                              </div>
+                
+                              <!-- FORMGROUP - evidenciaRegressao -->
+                              <div class="form-group col md-3">
+                                <label for="evidenciaRegressao">Evidência Regressão: </label>
+                                <div class="input-group">
+                                    <!-- INPUT evidenciaRegressao -->
+                                    <select name="evidenciaRegressao" required class="form-control" ngModel #evidenciaRegressao = "ngModel">
+                                        <option value="NF" selected>NÃO INFORMADO</option>
+                                      <option value="PRESENTE" selected>PRESENTE</option>
+                                      <option value="AUSENTE">AUSENTE</option>
+                                  </select>
+                                    <!-- INPUT evidenciaRegressao -->
+                                </div>
+                              </div>
+
+                               <!-- FORMGROUP - Associacao nevo melanocito -->
+                               <div class="form-group col md-3">
+                                  <label for="associacaoNevoMelanocito">Associação com Nevo Melanocito: </label>
+                                  <div class="input-group">
+                                      <!-- INPUT associacaoNevoMelanocito -->
+                                      <select name="associacaoNevoMelanocito" required class="form-control" ngModel #associacaoNevoMelanocito = "ngModel">
+                                          <option value="NF" selected>NÃO INFORMADO</option>
+                                        <option value="PRESENTE" selected>PRESENTE</option>
+                                        <option value="AUSENTE">AUSENTE</option>
+                                    </select>
+                                      <!-- INPUT associacaoNevoMelanocito -->
+                                  </div>
+                              </div>
+
+                       </div>
+                       <!--FIM FORM ROW 3 MELANOMA-->
+
+                       <!-- INICIO FORM ROW 4 MELANOMA-->
+                       <div class="for-row">
+
+                          <!-- FORMGROUP - margemCirurgiaProfunda -->
+                          <div class="form-group col-md-6"  >
+                              <label for="margemCirurgiaProfunda">Margem Cirurgia Profunda: </label>
+                              <div class="input-group">
+                                    <div class="col-form-label">
+                                            <div class="form-check form-check-inline mr-4">
+                                                    <input type="radio" id="comp"  class= "clark-check-box" name="margemCirurgiaProfunda" value="COMPROMETIDA" ngModel #margemCirurgiaProfunda=ngModel required (change)="desativaMargemProfunda()">
+                                                    <label class="form-check-label" for="comp"> COMPROMETIDA</label>
+                                            </div>
+                                            <div class="form-check form-check-inline mr-4">
+                                                    <input type="radio" id="neoplasico" class= "clark-check-box" name="margemCirurgiaProfunda" value="LCN" ngModel #margemCirurgiaProfunda=ngModel required (change)="desativaMargemProfunda()" >
+                                                    <label class="form-check-label" for="neoplasico">LIVRE DE COMPROMETIMENTO NEOPLÁSICO</label>
+                                            </div>
+                                            <div class="form-check form-check-inline mr-4">
+                                                    <input type="radio" id="livre" class= "clark-check-box"  name="margemCirurgiaProfunda" value="LIVRE" ngModel #margemCirurgiaProfunda=ngModel required (change)="ativaMargemProfunda()" >
+                                                    <label class="form-check-label" for="livre">LIVRE</label>
+                                            </div>
+                                    </div>
+                              </div>
+
+                              <div class = "input-group" *ngIf="isMargemProfundaLivre">
+                                <input 
+                                type="text" 
+                                class="form-control"
+                                name="margemProfundaLivre"
+                                placeholder="INFORMAÇÕES EXTRAS MARGEM PROFUNDA LIVRE"
+                                ngModel 
+                                #margemProfundaLivre="ngModel"
+                                >
+                              </div>
+                            </div>
+
+                            <!-- FORMGROUP - margemCirurgiaLateral -->
+                          <div class="form-group col-md-6"  >
+                              <label for="margemCirurgiaLateral">Margem Cirurgia Lateral: </label>
+                              <div class="input-group">
+                                    <div class="col-form-label">
+                                            <div class="form-check form-check-inline mr-4">
+                                                    <input type="radio" id="comp1"  class= "clark-check-box" name="margemCirurgiaLateral" value="COMPROMETIDA" ngModel #margemCirurgiaLateral=ngModel (change)="desativaMargemLateral()">
+                                                    <label class="form-check-label" for="comp1"> COMPROMETIDA</label>
+                                            </div>
+                                            <div class="form-check form-check-inline mr-4">
+                                                    <input type="radio" id="neoplasico1" class= "clark-check-box" name="margemCirurgiaLateral" value="LCN" ngModel #margemCirurgiaLateral=ngModel (change)="desativaMargemLateral()" >
+                                                    <label class="form-check-label" for="neoplasico1">LIVRE DE COMPROMETIMENTO NEOPLÁSICO</label>
+                                            </div>
+                                            <div class="form-check form-check-inline mr-4">
+                                                    <input type="radio" id="livre1" class= "clark-check-box"   name="margemCirurgiaLateral" value="LIVRE" ngModel #margemCirurgiaLateral=ngModel (change)="ativaMargemLateral()" >
+                                                    <label class="form-check-label" for="livre1">LIVRE</label>
+                                            </div>
+                                    </div> 
+                              </div>
+                              <div class = "input-group" *ngIf="isMargemLateralLivre">
+                                <input 
+                                type="text" 
+                                class="form-control"
+                                name="margemLateralLivre"
+                                placeholder="INFORMAÇÕES EXTRAS MARGEM LATERAL LIVRE"
+                                ngModel 
+                                #margemLateralLivre="ngModel"
+                                >
+                              </div>
+                          </div>
+
+                       </div>
+                       <!--FIM FORM ROW 4 MELANOMA-->
+
+                       <!--INICIO FORM ROW 5 MELANOMA-->
+                       <div class="form-row">
+                           
+                          <!-- FORMGROUP - INVASÃO VASCULAR -->
+                           <div class="form-group col md-6">
+                              <label for="invasaoVascular">Invasão Vascular: </label>
+                              <div class="input-group">
+                                  <!-- INPUT invasaoVascular -->
+                                  <select name="invasaoVascular" required class="form-control" ngModel #invasaoVascular = "ngModel">
+                                      <option value="NF" selected>NÃO INFORMADO</option>
+                                    <option value="PRESENTE" selected>PRESENTE</option>
+                                    <option value="AUSENTE">AUSENTE</option>
+                                </select>
+                                  <!-- INPUT invasaoVascular -->
+                              </div>
+                          </div>
+
+                          <!-- FORMGROUP - menorDistMargemRessecaoLateral -->
+                          <div class="form-group col md-6">
+                              <label for="menorDistMargemRessecaoLateral">Menor Distância Margem Resseção Lateral(mm): </label>
+                              <div class="input-group">
+                                  <!-- INPUT menorDistMargemRessecaoLateral -->
+                                    <input 
+                                      type="number" 
+                                      class="form-control"
+                                      name="menorDistMargemRessecaoLateral"
+                                      ngModel 
+                                      #menorDistMargemRessecaoLateral="ngModel"
+                                      required>
+                                  <!-- INPUT menorDistMargemRessecaoLateral -->
+                              </div>
+                          </div>
+
+
+                       </div>
+                       <!--FIM FORM ROW 5 MELANOMA-->
+
+                      </div>
+                      <!--FIM MELANOMA-->
+                    </div>
+                    <!--FIM INFS EXTRA DIAGNOSTICO-->
+
+                      <!--FORM ROW 5-->
+                      <div class=" form-row">
+                          <div class="text-left form-group col-md-2" id="botaoCadastrar">
+                              <!-- BUTTON SUBMISSAO -->
+                              <button 
+                                type="submit" 
+                                class="btn btn-success btn-lg"
+                                [disabled]="dadosCadastroForm.invalid">
+                                Cadastrar
+                                <i class="cui-check"></i>
+                              </button>
+                              
+                              
+                              <!-- BUTTON SUBMISSAO -->
+                            </div>
+                      </div>
+                       
+                      <!--FIM FORM ROW 5-->
+                    </form>
+                    <!-- FIM CORPO DO CADASTRO -->
+                  </div>
+                      
+            </div>
+      </div>
+    </div>
+  </div>

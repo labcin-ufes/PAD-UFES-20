@@ -1,0 +1,209 @@
+<div class="animated fadeIn">
+    <div class="row">
+        <div class="col-lg-12">
+
+<!-- CASO A REQUISIÇÃO FALHE -->
+<div class="card .mx-auto" *ngIf="flagFalha">
+    <div class="card-header">
+        <h4> Falha de comunicação </h4>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-danger text-center" role="alert">                        
+            <p>Infelizmente ocorreu uma falha de comunicação no sistema. Tente acessar novamente ou mais tarde. Caso persista, entre em contato com os desenvolvedores</p>
+        </div>
+    </div>
+</div>
+    
+<!-- <div class="row" *ngIf="!flagFalha && !flagSegmentar"> -->
+<div class="row" [hidden]="flagSegmentar" *ngIf="!flagFalha">
+    <div class="col-12">
+
+        <!-- FILTRO -->
+        <div class="card">
+
+            <!-- CABEÇALHO -->
+            <div class="card-header">
+                <i class="fa fa-filter"></i> 
+                <span class="tituloTabela">Filtrar lesões</span>
+            </div>
+
+            <div class="card-body">
+                <!-- INICIO: FORMULARIO DE PESQUISA -->
+                <form #dadosForm="ngForm" (ngSubmit)="recebeDadosForm()">
+                    <div class="row">
+                    
+                        <!-- INICIO: FILTRO SUS--> 
+                        <div class="form-group col-sm-4">
+                            <label>Cartão SUS:</label>
+                            <input
+                            type="text"
+                            class="form-control"
+                            id="cartaoSus"
+                            name="cartaoSus"
+                            ngModel
+                            minlength=18
+                            mask='000-0000-0000-0000'
+                            placeholder="000-0000-0000-0000"
+                            [dropSpecialCharacters]="false"> 
+                        </div>         
+                        <!-- FIM: FILTRO SUS-->
+
+                        <div class="form-group col-sm-4">
+                            <label for="tipoPac">Tipo de paciente:</label>
+                            <select [(ngModel)]='tipoPainel' class="form-control" id="tipoPac" name="tipoPac">
+                                <option>cirurgia</option>
+                                <option>dermato</option>
+                            </select>
+                        </div>
+                        <!-- FIM: FILTRO DE TIPO DE PACIENTE DERMATO/CIRURGIA -->
+
+                        <!-- INICIO: FILTRO DIAGNOSTICO IMAGENS NÃO SEGMENTADAS-->
+                        <div class="form-group col-sm-4">
+                            <label> Apenas imagens não segmentadas? </label><br>
+                            <label class="switch switch-label switch-primary">
+                                <input 
+                                    type="checkbox" 
+                                    class="switch-input"                                                 
+                                    ngModel
+                                    name="segmentado"
+                                    value="Sim"
+                                >
+                                <span 
+                                    class="switch-slider" 
+                                    data-checked="Sim" 
+                                    data-unchecked="Não">
+                                </span>
+                            </label>
+                        </div>
+                        <!-- FIM: FILTRO DIAGNOSTICO IMAGENS NÃO SEGMENTADAS-->
+
+                    </div>
+
+                <div class="form-group form-actions row col-12">
+                    <button class="btn btn-success btn-md" type="submit">
+                        <i class="fa fa-search"></i> Filtrar lesões
+                    </button>
+                </div>
+
+            </form>
+            <!-- FIM: FORMULÁRIO DE PESQUISA -->
+        
+            </div>
+        </div>
+        <!-- FIM FILTRO -->
+
+        <!-- TABELA DE LESÕES -->
+        <div class="card">
+
+            <!-- CABEÇALHO -->
+            <div class="card-header">
+                <i class="fa fa-th-list"></i> 
+                <span class="tituloTabela">Lista de lesões</span>
+            </div>
+
+            <div  class="table-responsive">
+                <table class="table table-striped">                            
+                    <thead>
+                        <tr>
+                            <th scope ="col">Cartão Sus</th>
+                            <th scope = "col">Diagnóstico Clinico</th>
+                            <th scope ="col">Região da Lesão</th>
+                            <th scope ="col">Visualizar imagens</th>
+                        </tr>
+                    </thead>
+
+                    <!-- <tbody *ngFor=" let teste of testeTabela"> -->
+                    <tbody *ngFor=" let lesao of lesoes">
+                        <tr scope ="row">
+                            <td> {{pegaCartaoSusPorLesaoId(lesao.id)}} </td>
+                            <td *ngIf="this.tipoPac == 'cirurgia'"> {{lesao.diagnosticoClinico}} </td>
+                            <td *ngIf="this.tipoPac == 'dermato'"> {{lesao.diagnostico}} </td>
+                            <td> {{lesao.regiao}} </td>                                  
+                            <td>
+                                    <button
+                                        type="button"
+                                        class="btn btn-success"
+                                        (click) = "flagShowImg = !flagShowImg; exibeImgPorLesao(lesao.id)">
+                                        <i class="fa fa-search-plus custom" style="font-size:18px"></i>
+                                    </button>
+                            </td>
+                        </tr>
+                        <tr scope="row" *ngIf="(flagShowImg) && (lesao.id === this.lesaoAtualId)">
+                            <td colspan="4">
+                                <div class="card-body">
+                                    <div *ngIf="lesao.imagens.length ==0" class="alert alert-warning text-center col-12" role="alert">
+                                            A lesão não possui imagens
+                                    </div>  
+                                    <div class="col-lg-3" style="float:left;" *ngFor="let imagem of lesao.imagens">
+                                        <div class="card">
+
+                                            <a href="{{url_api}}/api/imagem/baixar?nomeImg={{imagem.path}}&tipo={{tipoPainel}}" target="_blank">
+                                                <img src="{{url_api}}/api/imagem/baixar?nomeImg={{imagem.path}}&tipo={{tipoPainel}}&largura=200&altura=200"
+                                                alt="Lesão"
+                                                class="card-img-top">
+                                            </a>
+
+                                            <div class="card-footer">
+                                                <div class="row">
+
+                                                    <div class="col-3">
+                                                        <button
+                                                            type="button"
+                                                            class="btn"
+                                                            (click)="alternaFlagSegmentado(imagem)"
+                                                        >
+                                                            <i *ngIf="imagem.segmentado" class="fa fa-check-square-o custom" style="font-size:32px; float:left"></i>
+                                                            <i *ngIf="!imagem.segmentado"class="fa fa-square-o custom" style="font-size:32px; float:left"></i>
+                                                        </button>
+                                                    </div>
+
+                                                    <div class="col-9">
+                                                        <button
+                                                            type="button"
+                                                            class="btn btn-info"
+                                                            style="float:right"
+                                                            (click)="selecImgSeg(imagem.id, imagem.path)"
+                                                        >
+                                                            Segmentar
+                                                            <i class="fa fa-scissors"></i>
+                                                        </button>
+                                                    </div>                                                      
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>                  
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <!-- PAGINAÇÃO -->
+            <div class="card-body row d-flex justify-content-center">
+                <pagination [totalItems]="totalItens"
+                            [maxSize]="maxPagLinks"
+                            [(ngModel)]="paginaAtual"
+                            (pageChanged)="mudaPagina($event)"
+                            [itemsPerPage]="itensPorPag"
+                            previousText="Anterior"
+                            nextText="Próxima">
+                </pagination>                        
+            </div>
+            <div class="alert alert-secondary text-center" role="alert" style="margin-top: -20px;">
+                <strong> Pagina {{ this.paginaAtual }} de {{ this.totalPaginas }} </strong>
+            </div>               
+            <!-- PAGINAÇÃO -->
+        </div>
+        <!-- FIM TABELA DE LESÕES -->
+
+    </div>
+</div>
+
+<app-canvas (eventoCancelarSegmentacao)="cancelarSegmentacao($event)"
+            [imagemUrl]="this.imagemUrl"
+            [imagemId]="this.imagemId"
+            [imagemPath]="this.imagemPath"
+            [tipoPaciente]="this.tipoPainel"
+            *ngIf="flagSegmentar === true" >
+</app-canvas>

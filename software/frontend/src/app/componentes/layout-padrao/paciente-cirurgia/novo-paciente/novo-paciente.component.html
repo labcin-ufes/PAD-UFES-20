@@ -1,0 +1,1466 @@
+<div class="animated fadeIn">
+  <form #dadosCadastroForm="ngForm" (ngSubmit)="finalizaCadastro()" autocomplete="off">
+    <!-- <p>{{dadosCadastroForm.value | json}}</p> -->
+
+    <!-- INFORMACAO DA RESPOSTA -->
+    <div *ngIf="flagRespostaCadastro !== 'false'">
+      <div *ngIf="flagRespostaCadastro === 'problema-requisicao'" class="alert alert-danger" role="alert">
+        Houve um problema na comunicação com o banco de dados. Tente mais tarde ou entre em contado com os
+        desenvolvedores.
+      </div>
+    </div>
+    <!-- INFORMACAO DA RESPOSTA -->
+
+    <div class="row">
+      <div class="col-12">
+        <div class="card">
+          <div *ngIf="pacInput === null" class="card-header">
+            <i class="fa fa-address-card-o"></i>
+            <strong>Cartão do SUS</strong>
+          </div>
+          <div *ngIf="pacInput !== null" class="card-header">
+            <i class="fa fa-address-card-o"></i>
+            <strong>Editar o número do cartão do SUS</strong>
+          </div>
+          <div class="card-body">
+            <!-- FORMGROUP - SUS -->
+            <div class="row">
+            <div class="form-group col-lg-4">
+              <label for="cartaoSus"><strong>Número do cartão do SUS:</strong></label>
+              <div class="input-group">
+            
+                <!-- INPUT SUS -->
+                <input type="text" class="form-control" id="cartaoSus" name="cartaoSus" [ngModel]="pac.cartaoSus" required minlength=18 #cartaoSus="ngModel"
+                  mask='000-0000-0000-0000' placeholder="000-0000-0000-0000" [dropSpecialCharacters]="false" (keyup)="buscaPacienteSus(cartaoSus.value)">
+                <!-- INPUT SUS -->
+            
+                <!-- <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fa fa-envelope"></i></span>
+                          </div> -->
+              </div>
+            
+              <div *ngIf="!cartaoSus.valid && cartaoSus.touched" class="invalido">
+                Cartão SUS inválido.
+              </div>
+              <div *ngIf="cartaoJaExiste" class="invalido">
+                Este cartão do SUS já está cadastrado.
+              </div>
+            </div>
+            </div>
+            <!-- FIM FORMGROUP - SUS -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- INICIO PRIMEIRA ROW -->
+    <div class="row">
+      <div class="col-12">
+      <!-- SUB-CARD DADOS PROTOCOLARES -->
+      <div class="card">
+
+        <!-- CABEÇALHO CARD DADOS PROTOCOLARES -->
+        <div class="card-header">
+          <i class="fa fa-book"></i>
+          <strong>Dados protocolares</strong>
+        </div>
+
+        <div class="card-body">
+
+          <div class="row">
+          <!-- FORMGROUP - LOCAL ATENDIMENTO -->
+          <div class="form-group col-lg-4">
+            <label for="localUltimoAtendimento"><strong>Local de atendimento:</strong></label>
+            <div class="input-group">
+
+                <!-- INPUT LOCAL ATENDIMENTO -->
+                <input 
+                  type="text"
+                  class="form-control"        
+                  id="localUltimoAtendimento"             
+                  name="localUltimoAtendimento"
+                  [ngModel]="local"
+                  #localUltimoAtendimento="ngModel"
+                  minlength="3"
+                  required
+                  [ngbTypeahead]="listaCidades">
+                <!-- INPUT LOCAL ATENDIMENTO -->
+
+              <!-- <div class="input-group-prepend">
+                <span class="input-group-text"><i class="fa fa-user"></i></span>
+              </div> -->
+
+            </div>
+
+            <div *ngIf="!localUltimoAtendimento.valid && localUltimoAtendimento.touched" class="invalido">
+              O local de atendimento não foi informado.
+            </div>
+          </div>
+          <!-- FIM FORMGROUP - LOCAL ATENDIMENTO -->
+
+          <!-- FORMGROUP - DATA ATENDIMENTO -->
+          <div class="form-group col-lg-4">
+            <label for="dataUltimoAtendimento" ><strong>Data do atendimento:</strong></label>
+            <div class="input-group">
+
+
+              <!-- INPUT DATA ATENDIMENTO -->
+              <input id="dataUltimoAtendimento" type="date" max="2999-12-31" data-date-format="dd/MM/yyyy" validatedateformat class="form-control" name="dataUltimoAtendimento" [ngModel]="dataHoje | date:'yyyy-MM-dd'"
+                [value]="dataHoje | date:'yyyy-MM-dd'"#dataUltimoAtendimento="ngModel" required>
+              <!-- INPUT DATA ATENDIMENTO -->
+
+              <!-- <div class="input-group-prepend">
+                <span class="input-group-text"><i class="fa fa-user"></i></span>
+              </div> -->
+            </div>
+
+            <div *ngIf="!dataUltimoAtendimento.valid && dataUltimoAtendimento.touched" class="invalido">
+              A data de atendimento não foi informada.
+            </div>
+          </div>
+          <!-- FIM FORMGROUP - DATA ATENDIMENTO -->
+
+          <!-- FORMGROUP - PRONTUARIO -->
+          <div class="form-group col-lg-4">
+            <label for="prontuario"><strong>Número do prontuário:</strong></label>
+            <div class="input-group">
+
+              <!-- INPUT PRONTUARIO -->
+              <input type="text" class="form-control" id="prontuario" name="prontuario" [ngModel]="pac.prontuario" 
+                required minlength=1 #prontuario="ngModel">
+              <!-- INPUT PRONTUARIO -->
+
+              <!-- <div class="input-group-prepend">
+                <span class="input-group-text"><i class="fa fa-envelope"></i></span>
+              </div> -->
+            </div>
+
+            <div *ngIf="!prontuario.valid && prontuario.touched" class="invalido">
+              O prontuario não foi informado.
+            </div>
+          </div>
+          <!-- FIM FORMGROUP - PRONTUARIO -->
+          </div>
+
+        </div>
+        <!-- FIM CORPO SUB-CARD DADOS PROTOCOLARES -->
+
+      </div>
+      <!-- FIM SUB-CARD DADOS PROTOCOLARES -->
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-12">
+      <!-- SUB-CARD INFORMAÇÕES PESSOAIS -->
+      <div class="card">
+
+        <!-- CABEÇALHO CARD INFORMAÇÕES PESSOAIS-->
+        <div class="card-header">
+          <i class="fa fa-user-o"></i>
+          <strong>Informações pessoais</strong>
+        </div>
+
+        <div class="card-body">
+
+          <div class="row">
+          <!-- FORMGROUP - NOME COMPLETO -->
+          <div class="form-group col-lg-4">
+            <label for="nomeCompleto"><strong>Nome completo do paciente:</strong></label>
+            <div class="input-group">
+
+              <!-- INPUT NOME COMPLETO -->
+              <input type="text" class="form-control" id="nomeCompleto" name="nomeCompleto" [ngModel]="pac.nomeCompleto" required minlength=1
+                #nomeCompleto="ngModel">
+              <!-- INPUT NOME COMPLETO -->
+
+              <!-- <div class="input-group-prepend">
+                <span class="input-group-text"><i class="fa fa-envelope"></i></span>
+              </div> -->
+            </div>
+
+            <div *ngIf="!nomeCompleto.valid && nomeCompleto.touched" class="invalido">
+              O nome completo do paciente não foi informado.
+            </div>
+          </div>
+          <!-- FIM FORMGROUP - NOME COMPLETO -->
+
+          <!-- FORMGROUP - NOME MAE -->
+          <div class="form-group col-lg-4">
+            <label for="nomeMae"><strong>Nome completo da mãe:</strong></label>
+            <div class="input-group">
+
+              <!-- INPUT NOME MAE -->
+              <input type="text" class="form-control" id="nomeMae" name="nomeMae" [ngModel]="pac.nomeMae" required minlength=1 #nomeMae="ngModel">
+              <!-- INPUT NOME MAE -->
+
+              <!-- <div class="input-group-prepend">
+                <span class="input-group-text"><i class="fa fa-envelope"></i></span>
+              </div> -->
+            </div>
+
+            <div *ngIf="!nomeMae.valid && nomeMae.touched" class="invalido">
+              O nome completo da mãe não foi informado.
+            </div>
+          </div>
+          <!-- FIM FORMGROUP - NOME MAE -->
+
+          <!-- FORMGROUP - DATA NASCIMENTO -->
+          <div class="form-group col-lg-4">
+            <label for="dataNascimento"><strong>Data de nascimento:</strong></label>
+            <div class="input-group">
+
+
+              <!-- INPUT DATA NASCIMENTO -->
+              <input id="dataNascimento" type="date" max="2999-12-31" data-date-format="dd/MM/yyyy" validatedateformat class="form-control"
+                name="dataNascimento" [ngModel]="pac.dataNascimento" #dataNascimento="ngModel" required>
+              <!-- INPUT DATA NASIMENTO -->
+
+              <!-- <div class="input-group-prepend">
+                <span class="input-group-text"><i class="fa fa-user"></i></span>
+              </div> -->
+            </div>
+
+            <div *ngIf="!dataNascimento.valid && dataNascimento.touched" class="invalido">
+              A data de nascimento não foi informada.
+            </div>
+          </div>
+          <!-- FIM FORMGROUP - DATA NASCIMENTO -->
+          </div>
+
+          <div class="row">
+          <!-- FORMGROUP - SEXO -->
+          <div class="form-group col-lg-4">
+            <label for="sexo"><strong>Sexo:</strong></label>
+            <div class="input-group">
+
+
+              <!-- INPUT SEXO -->
+              <div class="col-form-label">
+                <div class="form-check form-check-inline mr-4">
+                  <input class="form-check-input" id="sexo1" type="radio" value="F" name="sexo" [ngModel]="pac.sexo" #sexo="ngModel"
+                    required>
+                  <label class="form-check-label" for="sexo1">Feminino</label>
+                </div>
+                <div class="form-check form-check-inline mr-4">
+                  <input class="form-check-input" id="sexo2" type="radio" value="M" name="sexo" [ngModel]="pac.sexo" #sexo="ngModel"
+                    required>
+                  <label class="form-check-label" for="sexo2">Masculino</label>
+                </div>
+              </div>
+              <!-- INPUT SEXO -->
+            </div>
+            <!-- Sexo obrigatorio ;) -->
+            <div *ngIf="!sexo.valid && sexo.touched" class="invalido">
+              O sexo não foi informado..
+            </div>
+          </div>
+          <!-- FIM FORMGROUP - SEXO -->
+
+          <!-- FORMGROUP - ESTADO CIVIL -->
+          <div class="form-group col-lg-4">
+            <label for="estadoCivil"><strong>Estado civil:</strong></label>
+            <div class="input-group">
+
+
+              <!-- INPUT ESTADO CIVIL -->
+              <div class="col-form-label">
+                <div class="form-check form-check-inline mr-4">
+                  <input class="form-check-input" id="estadoCivil1" type="radio" value="S" name="estadoCivil" [ngModel]="pac.estadoCivil" 
+                    #estadoCivil="ngModel" required>
+                  <label class="form-check-label" for="estadoCivil1">Solteiro</label>
+                </div>
+                <div class="form-check form-check-inline mr-4">
+                  <input class="form-check-input" id="estadoCivil2" type="radio" value="C" name="estadoCivil" [ngModel]="pac.estadoCivil" 
+                    #estadoCivil="ngModel" required>
+                  <label class="form-check-label" for="estadoCivil2">Casado</label>
+                </div>
+                <div class="form-check form-check-inline mr-4">
+                  <input class="form-check-input" id="estadoCivil3" type="radio" value="D" name="estadoCivil" [ngModel]="pac.estadoCivil" 
+                    #estadoCivil="ngModel" required>
+                  <label class="form-check-label" for="estadoCivil3">Divorciado</label>
+                </div>
+                <div class="form-check form-check-inline mr-4">
+                  <input class="form-check-input" id="estadoCivil4" type="radio" value="V" name="estadoCivil" [ngModel]="pac.estadoCivil" 
+                    #estadoCivil="ngModel" required>
+                  <label class="form-check-label" for="estadoCivil4">Viúvo</label>
+                </div>
+              </div>
+              <!-- INPUT ESTADO CIVIL -->
+            </div>
+
+            <div *ngIf="!estadoCivil.valid && estadoCivil.touched" class="invalido">
+              O estado civil não foi informado.
+            </div>
+          </div>
+          <!-- FIM FORMGROUP - ESTADO CIVIL -->
+          </div>
+
+          <div class="row">
+          <!-- FORMGROUP - LOCAL NASCIMENTO -->
+          <div class="form-group col-lg-4">
+            <label for="localNascimento"><strong>Local de nascimento:</strong></label>
+            <div class="input-group">
+
+              <!-- INPUT LOCAL NASCIMENTO -->
+              <input type="text" class="form-control" id="localNascimento" name="localNascimento" [ngModel]="pac.localNascimento" required
+                minlength=1 #localNascimento="ngModel">
+              <!-- INPUT LOCAL NASCIMENTO -->
+
+              <!-- <div class="input-group-prepend">
+                <span class="input-group-text"><i class="fa fa-envelope"></i></span>
+              </div> -->
+            </div>
+
+            <div *ngIf="!localNascimento.valid && localNascimento.touched" class="invalido">
+              O local de nascimento não foi informado.
+            </div>
+          </div>
+          <!-- FIM FORMGROUP - LOCAL NASCIMENTO -->
+
+          <!-- FORMGROUP - ESTADO NASCIMENTO -->
+          <div class="form-group col-lg-4">
+            <label for="estadoNascimento"><strong>Estado de nascimento:</strong></label>
+            <div class="input-group">
+
+              <!-- INPUT ESTADO NASCIMENTO -->
+              <input type="text" class="form-control" id="estadoNascimento" name="estadoNascimento" [ngModel]="estado"
+                required minlength=1 #estadoNascimento="ngModel" [ngbTypeahead]="listaEstados">
+              <!-- INPUT ESTADO NASCIMENTO -->
+
+              <!-- <div class="input-group-prepend">
+                <span class="input-group-text"><i class="fa fa-envelope"></i></span>
+              </div> -->
+            </div>
+
+            <div *ngIf="!estadoNascimento.valid && estadoNascimento.touched" class="invalido">
+              O estado de nascimento não foi informado.
+            </div>
+          </div>
+          <!-- FIM FORMGROUP - ESTADO NASCIMENTO -->
+
+          <!-- FORMGROUP - ENDEREÇO ATUAL -->
+          <div class="form-group col-lg-4">
+            <label for="endereco"><strong>Endereço atual:</strong></label>
+            <div class="input-group">
+
+              <!-- INPUT ENDEREÇO ATUAL -->
+              <input type="text" class="form-control" id="endereco" name="endereco" [ngModel]="pac.endereco" required minlength=1
+                #endereco="ngModel">
+              <!-- INPUT ENDEREÇO ATUAL -->
+
+              <!-- <div class="input-group-prepend">
+                <span class="input-group-text"><i class="fa fa-envelope"></i></span>
+              </div> -->
+            </div>
+
+            <div *ngIf="!endereco.valid && endereco.touched" class="invalido">
+              O endereço atual não foi informado.
+            </div>
+          </div>
+          <!-- FIM FORMGROUP - ENDEREÇO ATUAL -->
+          </div>
+
+        </div>
+        <!-- FIM CORPO SUB-CARD INFORMAÇÕES PESSOAIS -->
+
+      </div>
+      <!-- FIM SUB-CARD INFORMAÇÕES PESSOAIS -->
+      </div>
+    </div>
+        
+    <div class="row">
+      <div class="col-12">
+      <!-- INICIO SUB-CARD INFORMACOES SOCIOECONOMICAS -->
+      <div class="card">
+  
+        <!-- INFORMACOES SOCIOECONOMICAS CABEÇALHO -->
+        <div class="card-header">
+          <i class="fa fa-money"></i>
+          <strong>Informações socioeconômicas</strong>
+        </div>
+  
+        <!-- INICIO INFORMACOES SOCIOECONOMICAS CORPO -->
+        <div class="card-body">
+  
+          <div class="row">
+          <!-- FORMGROUP - ATIVIDADE PRINCIPAL -->
+          <div class="form-group col-lg-6">
+            <label for="atvPrincipal"><strong>Atividade principal:</strong></label>
+            <div class="input-group">
+              <!-- INPUT ATIVIDADE PRINCIPAL -->
+              <input type="text" class="form-control" id="atvPrincipal" name="atvPrincipal" required minlength=1 [ngModel]="pac.atvPrincipal" 
+                #atvPrincipal="ngModel" [ngbTypeahead]="listaProfissoes">
+              <!-- INPUT ATIVIDADE PRINCIPAL -->
+  
+              <!-- <div class="input-group-prepend">
+                <span class="input-group-text"><i class="fa fa-envelope"></i></span>
+              </div> -->
+            </div>
+  
+            <div *ngIf="!atvPrincipal.valid && atvPrincipal.touched" class="invalido">
+              A atividade principal não foi informada.
+            </div>
+          </div>
+          <!-- FIM FORMGROUP - ATIVIDADE PRINCIPAL -->
+  
+          <!-- FORMGROUP - IDADE INICIO ATIVIDADE -->
+          <div class="form-group col-lg-6">
+            <label for="idadeInicioAtv"><strong>Idade em que começou a trabalhar:</strong></label>
+            <div class="input-group">
+              <!-- INPUT IDADE INICIO ATIVIDADE -->
+              <input type="number" min="1" class="form-control" id="idadeInicioAtv" name="idadeInicioAtv" required
+                [ngModel]="pac.idadeInicioAtv" #idadeInicioAtv="ngModel">
+              <!-- INPUT IDADE INICIO ATIVIDADE -->
+  
+              <!-- <div class="input-group-prepend">
+                <span class="input-group-text"><i class="fa fa-envelope"></i></span>
+              </div> -->
+            </div>
+  
+            <div *ngIf="!idadeInicioAtv.valid && idadeInicioAtv.touched" class="invalido">
+              A idade em que começou a trabalhar não foi informada.
+            </div>
+          </div>
+          <!-- FIM FORMGROUP - IDADE INICIO ATIVIDADE -->
+          </div>
+  
+          <div class="row">
+          <!-- FORMGROUP - ESCOLARIDADE -->
+          <div class="form-group col-lg-12">
+            <label for="escolaridade"><strong>Nível de escolaridade:</strong></label>
+            <div class="input-group">
+  
+  
+              <!-- INPUT ESCOLARIDADE -->
+              <div class="col-form-label">
+                <div class="form-check form-check-inline mr-4">
+                  <input class="form-check-input" id="escolaridade1" type="radio" value="NN" name="escolaridade" [ngModel]="pac.escolaridade" 
+                    #escolaridade="ngModel" required>
+                  <label class="form-check-label" for="escolaridade1">Nenhuma</label>
+                </div>
+                <div class="form-check form-check-inline mr-4">
+                  <input class="form-check-input" id="escolaridade2" type="radio" value="FI" name="escolaridade" [ngModel]="pac.escolaridade" 
+                    #escolaridade="ngModel" required>
+                  <label class="form-check-label" for="escolaridade2">Fundamental incompleto</label>
+                </div>
+                <div class="form-check form-check-inline mr-4">
+                  <input class="form-check-input" id="escolaridade3" type="radio" value="FC" name="escolaridade" [ngModel]="pac.escolaridade" 
+                    #escolaridade="ngModel" required>
+                  <label class="form-check-label" for="escolaridade3">Fundamental completo</label>
+                </div>
+                <div class="form-check form-check-inline mr-4">
+                  <input class="form-check-input" id="escolaridade4" type="radio" value="EI" name="escolaridade" [ngModel]="pac.escolaridade" 
+                    #escolaridade="ngModel" required>
+                  <label class="form-check-label" for="escolaridade4">Ensino médio incompleto</label>
+                </div>
+                <div class="form-check form-check-inline mr-4">
+                  <input class="form-check-input" id="escolaridade5" type="radio" value="EC" name="escolaridade" [ngModel]="pac.escolaridade" 
+                    #escolaridade="ngModel" required>
+                  <label class="form-check-label" for="escolaridade5">Ensino médio completo</label>
+                </div>
+                <div class="form-check form-check-inline mr-4">
+                  <input class="form-check-input" id="escolaridade6" type="radio" value="SI" name="escolaridade" [ngModel]="pac.escolaridade" 
+                    #escolaridade="ngModel" required>
+                  <label class="form-check-label" for="escolaridade6">Superior incompleto</label>
+                </div>
+                <div class="form-check form-check-inline mr-4">
+                  <input class="form-check-input" id="escolaridade7" type="radio" value="SC" name="escolaridade" [ngModel]="pac.escolaridade" 
+                    #escolaridade="ngModel" required>
+                  <label class="form-check-label" for="escolaridade7">Superior completo</label>
+                </div>
+              </div>
+              <!-- INPUT ESCOLARIDADE -->
+            </div>
+  
+            <div *ngIf="!escolaridade.valid && escolaridade.touched" class="invalido">
+              O nível de escolaridade não foi informado.
+            </div>
+          </div>
+          <!-- FIM FORMGROUP - ESCOLARIDADE -->
+          </div>
+  
+          <div class="row">
+          <!-- FORMGROUP - NUMERO PESSOAS -->
+          <div class="form-group col-lg-6">
+            <label for="numPessoasCasa"><strong>Número de pessoas que vivem na residência:</strong></label>
+            <div class="input-group">
+              <!-- INPUT NUMERO PESSOAS -->
+              <input type="number" min="1" class="form-control" id="numPessoasCasa" name="numPessoasCasa" required
+                [ngModel]="pac.numPessoasCasa" #numPessoasCasa="ngModel">
+              <!-- INPUT NUMERO PESSOAS -->
+  
+              <!-- <div class="input-group-prepend">
+                <span class="input-group-text"><i class="fa fa-envelope"></i></span>
+              </div> -->
+            </div>
+  
+            <div *ngIf="!numPessoasCasa.valid && numPessoasCasa.touched" class="invalido">
+              O número de pessoas que vive na residência não foi informado.
+            </div>
+          </div>
+          <!-- FIM FORMGROUP - NUMERO PESSOAS -->
+  
+          <!-- FORMGROUP - RENDA FAMILIAR -->
+          <div class="form-group col-lg-6">
+            <label for="renda1"><strong>Renda familiar (em salários mínimos):</strong></label>
+            <div class="input-group">
+  
+              <!-- INPUT RENDA FAMILIAR -->
+              <div class="col-form-label">
+                <div class="form-check form-check-inline mr-4">
+                  <input class="form-check-input" id="renda1" type="radio" value="A1" name="renda" [ngModel]="pac.renda" #renda="ngModel"
+                    required>
+                  <label class="form-check-label" for="renda1">Menor ou igual a 1</label>
+                </div>
+                <div class="form-check form-check-inline mr-4">
+                  <input class="form-check-input" id="renda2" type="radio" value="1-3" name="renda" [ngModel]="pac.renda" #renda="ngModel"
+                    required>
+                  <label class="form-check-label" for="renda2">Maior que 1 e menor ou igual a 3</label>
+                </div>
+                <div class="form-check form-check-inline mr-4">
+                  <input class="form-check-input" id="renda3" type="radio" value="3-5" name="renda" [ngModel]="pac.renda" #renda="ngModel"
+                    required>
+                  <label class="form-check-label" for="renda3">Maior que 3 e menor ou igual a 5</label>
+                </div>
+                <div class="form-check form-check-inline mr-4">
+                  <input class="form-check-input" id="renda4" type="radio" value="M5" name="renda" [ngModel]="pac.renda" #renda="ngModel"
+                    required>
+                  <label class="form-check-label" for="renda4">Maior que 5</label>
+                </div>
+              </div>
+              <!-- INPUT RENDA FAMILIAR -->
+            </div>
+  
+            <div *ngIf="!renda.valid && renda.touched" class="invalido">
+              Renda familiar não foi informada.
+            </div>
+          </div>
+          <!-- FIM FORMGROUP - RENDA FAMILIAR -->
+          </div>
+  
+          <div class="row">
+          <!-- FORMGROUP - REDE ESGOTO -->
+          <div class="form-group col-lg-6">
+            <label for="redeEsgoto1"><strong>Possui rede de esgoto?</strong></label>
+            <div class="input-group">
+  
+              <!-- INPUT REDE ESGOTO -->
+              <div class="col-form-label">
+                <div class="form-check form-check-inline mr-4">
+                  <input class="form-check-input" id="redeEsgoto1" type="radio" value="S" name="redeEsgoto" [ngModel]="pac.redeEsgoto" 
+                    #redeEsgoto="ngModel" required>
+                  <label class="form-check-label" for="redeEsgoto1">Sim</label>
+                </div>
+                <div class="form-check form-check-inline mr-4">
+                  <input class="form-check-input" id="redeEsgoto2" type="radio" value="N" name="redeEsgoto" [ngModel]="pac.redeEsgoto" 
+                    #redeEsgoto="ngModel" required>
+                  <label class="form-check-label" for="redeEsgoto2">Não</label>
+                </div>
+              </div>
+              <!-- INPUT REDE ESGOTO -->
+            </div>
+  
+            <div *ngIf="!redeEsgoto.valid && redeEsgoto.touched" class="invalido">
+              Rede de esgoto não informado.
+            </div>
+          </div>
+          <!-- FIM FORMGROUP - REDE ESGOTO -->
+  
+          <!-- FORMGROUP - AGUA ENCANADA -->
+          <div class="form-group col-lg-6">
+            <label for="aguaEncanada1"><strong>Possui água encanada?</strong></label>
+            <div class="input-group">
+  
+              <!-- INPUT AGUA ENCANADA -->
+              <div class="col-form-label">
+                <div class="form-check form-check-inline mr-4">
+                  <input class="form-check-input" id="aguaEncanada1" type="radio" value="S" name="aguaEncanada" [ngModel]="pac.aguaEncanada" 
+                    #aguaEncanada="ngModel" required>
+                  <label class="form-check-label" for="aguaEncanada1">Sim</label>
+                </div>
+                <div class="form-check form-check-inline mr-4">
+                  <input class="form-check-input" id="aguaEncanada2" type="radio" value="N" name="aguaEncanada" [ngModel]="pac.aguaEncanada" 
+                    #aguaEncanada="ngModel" required>
+                  <label class="form-check-label" for="aguaEncanada2">Não</label>
+                </div>
+              </div>
+              <!-- INPUT AGUA ENCANADA -->
+            </div>
+  
+            <div *ngIf="!aguaEncanada.valid && aguaEncanada.touched" class="invalido">
+              Água encanda não informada.
+            </div>
+          </div>
+          <!-- FIM FORMGROUP - AGUA ENCANADA -->
+          </div>
+  
+        </div>
+        <!-- FIM INFORMACOES SOCIOECONOMICAS CORPO -->
+  
+      </div>
+      <!-- FIM SUB-CARD INFORMACOES SOCIOECONOMICAS -->
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-12">
+      <!-- SUB-CARD MAIS INFORMAÇÕES PESSOAIS -->
+      <div class="card">
+    
+        <!-- CABEÇALHO CARD MAIS INFORMAÇÕES PESSOAIS -->
+        <div class="card-header">
+          <i class="fa fa-user-o"></i>
+          <strong>Mais informações pessoais</strong>
+        </div>
+    
+        <div class="card-body">
+    
+          <div class="row">
+          <!-- FORMGROUP - CIGARRO -->
+          <div class="form-group col-lg-6">
+            <label for="usoCigarro"><strong>Faz uso de cigarro?</strong></label>
+            <div class="input-group">
+    
+    
+              <!-- INPUT CIGARRO -->
+              <div class="col-form-label">
+                <div class="form-check form-check-inline mr-4">
+                  <input class="form-check-input" id="usoCigarro1" type="radio" value="NAO" name="usoCigarro" [ngModel]="pac.usoCigarro" 
+                    #usoCigarro="ngModel" required>
+                  <label class="form-check-label" for="usoCigarro1">Não</label>
+                </div>
+                <div class="form-check form-check-inline mr-4">
+                  <input class="form-check-input" id="usoCigarro2" type="radio" value="ATE5" name="usoCigarro" [ngModel]="pac.usoCigarro" 
+                    #usoCigarro="ngModel" required>
+                  <label class="form-check-label" for="usoCigarro2">Menos de 5 cigarros por dia</label>
+                </div>
+                <div class="form-check form-check-inline mr-4">
+                  <input class="form-check-input" id="usoCigarro3" type="radio" value="5A10" name="usoCigarro" [ngModel]="pac.usoCigarro" 
+                    #usoCigarro="ngModel" required>
+                  <label class="form-check-label" for="usoCigarro3">De 5 a 10 cigarros por dia</label>
+                </div>
+                <div class="form-check form-check-inline mr-4">
+                  <input class="form-check-input" id="usoCigarro4" type="radio" value="M10" name="usoCigarro" [ngModel]="pac.usoCigarro" 
+                    #usoCigarro="ngModel" required>
+                  <label class="form-check-label" for="usoCigarro4">Mais do que 10 cigarros por dia</label>
+                </div>
+              </div>
+              <!-- INPUT CIGARRO -->
+            </div>
+    
+            <div *ngIf="!usoCigarro.valid && usoCigarro.touched" class="invalido">
+              Não informou se o paciente é fumante.
+            </div>
+          </div>
+          <!-- FIM FORMGROUP - CIGARRO -->
+
+          <!-- FORMGROUP - ALCOLICA -->
+          <div class="form-group col-lg-6">
+            <label for="usoBebida"><strong>Faz uso de bebida alcólica?</strong></label>
+            <div class="input-group">
+          
+              <!-- INPUT ALCOLICA -->
+              <div class="col-form-label">
+                <div class="form-check form-check-inline mr-4">
+                  <input class="form-check-input" id="usoBebida1" type="radio" value="NAO" name="usoBebida" [ngModel]="pac.usoBebida" #usoBebida="ngModel"
+                    required>
+                  <label class="form-check-label" for="usoBebida1">Não</label>
+                </div>
+                <div class="form-check form-check-inline mr-4">
+                  <input class="form-check-input" id="usoBebida2" type="radio" value="DIA" name="usoBebida" [ngModel]="pac.usoBebida" 
+                    #usoBebida="ngModel" required>
+                  <label class="form-check-label" for="usoBebida2">Diariamente</label>
+                </div>
+                <div class="form-check form-check-inline mr-4">
+                  <input class="form-check-input" id="usoBebida3" type="radio" value="FDS" name="usoBebida" [ngModel]="pac.usoBebida" 
+                    #usoBebida="ngModel" required>
+                  <label class="form-check-label" for="usoBebida3">Finais de semana</label>
+                </div>
+              </div>
+              <!-- INPUT ALCOLICA -->
+            </div>
+          
+            <div *ngIf="!usoBebida.valid && usoBebida.touched" class="invalido">
+              Não informou se o paciente faz uso de bebida alcólica.
+            </div>
+          </div>
+          <!-- FIM FORMGROUP - ALCOLICA -->
+          </div>
+
+          <div class="row">
+          <!-- FORMGROUP - AGROTOXICO -->
+          <div class="form-group col-lg-6">
+            <label for="usoAgrotoxico"><strong>Faz uso ou mantém contato com agrotóxico? Se sim, qual?</strong></label>
+            <div class="input-group">
+              <!-- INPUT AGROTOXICO -->
+              <input type="text" class="form-control" id="usoAgrotoxico" name="usoAgrotoxico"
+              required minlength=1 [ngModel]="agrotoxico" #usoAgrotoxico="ngModel">
+              <!-- INPUT AGROTOXICO -->
+          
+              <!-- <div class="input-group-prepend">
+                <span class="input-group-text"><i class="fa fa-envelope"></i></span>
+              </div> -->
+            </div>
+          
+            <div *ngIf="!usoAgrotoxico.valid && usoAgrotoxico.touched" class="invalido">
+              Não informou se o paciente mantém contato com agrotóxico.
+            </div>
+          </div>
+          <!-- FIM FORMGROUP - AGROTOXICO -->
+          </div>
+
+          <div class="row">
+          <!-- FORMGROUP - TIPO PELE -->
+          <div class="form-group col-lg-6">
+            <label for="tipoPele"><strong>Tipo de pele?</strong>
+              <!-- POPOVER SOBRE O TIPO DE PELE -->
+              <ng-template #popTipoPele>
+                <p>
+                <span><strong>Tipo 1: </strong>Pele muito branca, sardas, cabelo loiro ou ruivo, olhos claros.</span>
+                <br>
+                <span><strong>Tipo 2: </strong>Pele branca, cabelo loiro, olhos claros.</span>
+                <br>
+                <span><strong>Tipo 3: </strong>Pele branca, cabelos e olhos de outras cores que não claros.</span>
+                <br>
+                <span><strong>Tipo 4: </strong>Pele moderadamente pigmentada ou pele morena clara.</span>
+                <br>
+                <span><strong>Tipo 5: </strong>Pele escura.</span>
+                <br>
+                <span><strong>Tipo 6: </strong>Pele muito escura.</span>
+                </p>
+              </ng-template>
+              <button type="button" class="btn btn-info btn-sm" placement="right" [ngbPopover]="popTipoPele"
+                popoverTitle="Orientações sobre os tipos de pele"><i class="fa fa-question"></i>
+              </button>
+              <!-- POPOVER SOBRE O TIPO DE PELE -->
+            </label>
+            <div class="input-group">
+          
+              <!-- INPUT TIPO PELE -->
+              <div class="col-form-label">
+                <div class="form-check form-check-inline mr-4">
+                  <input class="form-check-input" id="tipoPele1" type="radio" value="1" name="tipoPele" [ngModel]="pac.tipoPele" #tipoPele="ngModel"
+                    required>
+                  <label class="form-check-label" for="tipoPele1">1</label>
+                </div>
+                <div class="form-check form-check-inline mr-4">
+                  <input class="form-check-input" id="tipoPele2" type="radio" value="2" name="tipoPele" [ngModel]="pac.tipoPele" #tipoPele="ngModel"
+                    required>
+                  <label class="form-check-label" for="tipoPele2">2</label>
+                </div>
+                <div class="form-check form-check-inline mr-4">
+                  <input class="form-check-input" id="tipoPele3" type="radio" value="3" name="tipoPele" [ngModel]="pac.tipoPele" #tipoPele="ngModel"
+                    required>
+                  <label class="form-check-label" for="tipoPele3">3</label>
+                </div>
+                <div class="form-check form-check-inline mr-4">
+                  <input class="form-check-input" id="tipoPele3" type="radio" value="4" name="tipoPele" [ngModel]="pac.tipoPele" #tipoPele="ngModel"
+                    required>
+                  <label class="form-check-label" for="tipoPele3">4</label>
+                </div>
+                <div class="form-check form-check-inline mr-4">
+                  <input class="form-check-input" id="tipoPele3" type="radio" value="5" name="tipoPele" [ngModel]="pac.tipoPele" #tipoPele="ngModel"
+                    required>
+                  <label class="form-check-label" for="tipoPele3">5</label>
+                </div>
+                <div class="form-check form-check-inline mr-4">
+                  <input class="form-check-input" id="tipoPele3" type="radio" value="6" name="tipoPele" [ngModel]="pac.tipoPele" #tipoPele="ngModel"
+                    required>
+                  <label class="form-check-label" for="tipoPele3">6</label>
+                </div>
+              </div>
+              <!-- INPUT TIPO PELE -->
+            </div>
+          
+            <div *ngIf="!tipoPele.valid && tipoPele.touched" class="invalido">
+              Tipo de pele não informado.
+            </div>
+          </div>
+          <!-- FIM FORMGROUP - TIPO PELE -->
+
+          <!-- FORMGROUP - DISTROFIA -->
+          <div class="form-group col-lg-6">
+            <label for="destrofiaSolar"><strong>Grau de distrofia solar:</strong>
+              <!-- POPOVER SOBRE DISTROFIA SOLAR -->
+              <ng-template #popDistrofia>
+                <p>
+                <span><strong>Pré-distrófica: </strong>Pele com irregularidades (elevações).</span>
+                <br>
+                <span><strong>Leve: </strong>Manchas escuras.</span>
+                <br>
+                <span><strong>Moderada: </strong>Pele áspera e descamativa, com nódulos (casca de laranja).</span>
+                <br>
+                <span><strong>Forte: </strong>Pele ondulada, múltiplas manchas e sinais, com nódulos sangrantes.</span>
+                </p>
+              </ng-template>
+              <button type="button" class="btn btn-info btn-sm" placement="right" [ngbPopover]="popDistrofia"
+                popoverTitle="Orientações sobre o grau de distrofia solar"><i class="fa fa-question"></i>
+              </button>
+              <!-- POPOVER SOBRE DISTROFIA SOLAR -->
+            </label>
+            <div class="input-group">
+          
+              <!-- INPUT DISTROFIA -->
+              <div class="col-form-label">
+                <div class="form-check form-check-inline mr-4">
+                  <input class="form-check-input" id="destrofiaSolar1" type="radio" value="A" name="destrofiaSolar" [ngModel]="pac.destrofiaSolar" #destrofiaSolar="ngModel"
+                    required>
+                  <label class="form-check-label" for="destrofiaSolar1">Ausente</label>
+                </div>
+                <div class="form-check form-check-inline mr-4">
+                  <input class="form-check-input" id="destrofiaSolar3" type="radio" value="P" name="destrofiaSolar" [ngModel]="pac.destrofiaSolar" #destrofiaSolar="ngModel"
+                    required>
+                  <label class="form-check-label" for="destrofiaSolar3">Pré-distrófica</label>
+                </div>
+                <div class="form-check form-check-inline mr-4">
+                  <input class="form-check-input" id="destrofiaSolar2" type="radio" value="L" name="destrofiaSolar" [ngModel]="pac.destrofiaSolar" #destrofiaSolar="ngModel"
+                    required>
+                  <label class="form-check-label" for="destrofiaSolar2">Leve</label>
+                </div>
+                <div class="form-check form-check-inline mr-4">
+                  <input class="form-check-input" id="destrofiaSolar3" type="radio" value="M" name="destrofiaSolar" [ngModel]="pac.destrofiaSolar" #destrofiaSolar="ngModel"
+                    required>
+                  <label class="form-check-label" for="destrofiaSolar3">Moderada</label>
+                </div>
+                <div class="form-check form-check-inline mr-4">
+                  <input class="form-check-input" id="destrofiaSolar3" type="radio" value="F" name="destrofiaSolar" [ngModel]="pac.destrofiaSolar" #destrofiaSolar="ngModel"
+                    required>
+                  <label class="form-check-label" for="destrofiaSolar3">Forte</label>
+                </div>
+              </div>
+              <!-- INPUT DISTROFIA -->
+            </div>
+          
+            <div *ngIf="!destrofiaSolar.valid && destrofiaSolar.touched" class="invalido">
+              Grau de destrofia solar não informado.
+            </div>
+          </div>
+          <!-- FIM FORMGROUP - DISTROFIA -->
+          </div>
+
+          <div class="row">
+          <!-- FORMGROUP - EXPOSTO AO SOL -->
+          <div class="form-group col-lg-6">
+            <label for="expSol"><strong>Quantas horas fica exposto ao sol por dia?</strong></label>
+            <div class="input-group">
+              <!-- INPUT EXPOSTO AO SOL -->
+              <input type="number" min="0" class="form-control" id="expSol" name="expSol" required
+                [ngModel]="pac.expSol" #expSol="ngModel">
+              <!-- INPUT EXPOSTO AO SOL -->
+  
+              <!-- <div class="input-group-prepend">
+                <span class="input-group-text"><i class="fa fa-envelope"></i></span>
+              </div> -->
+            </div>
+  
+            <div *ngIf="!expSol.valid && expSol.touched" class="invalido">
+              Não informou quantas horas o paciente fica exposto ao sol.
+            </div>
+          </div>
+          <!-- FIM FORMGROUP - EXPOSTO AO SOL -->
+
+          <!-- FORMGROUP - EXPOSICAO -->
+          <div class="form-group col-lg-6">
+            <label for="horaExpSol"><strong>Horário de maior exposição ao sol:</strong></label>
+            <div class="input-group">
+          
+              <!-- INPUT EXPOSICAO -->
+              <div class="col-form-label">
+                <div class="form-check form-check-inline mr-4">
+                  <input class="form-check-input" id="horaExpSol1" type="radio" value="M" name="horaExpSol" [ngModel]="pac.horaExpSol" 
+                    #horaExpSol="ngModel" required>
+                  <label class="form-check-label" for="horaExpSol1">Antes das 9h e a partir de 16h</label>
+                </div>
+                <div class="form-check form-check-inline mr-4">
+                  <input class="form-check-input" id="horaExpSol2" type="radio" value="T" name="horaExpSol" [ngModel]="pac.horaExpSol" 
+                    #horaExpSol="ngModel" required>
+                  <label class="form-check-label" for="horaExpSol2">Entre 9h e 16h</label>
+                </div>
+                <div class="form-check form-check-inline mr-4">
+                  <input class="form-check-input" id="horaExpSol3" type="radio" value="A" name="horaExpSol" [ngModel]="pac.horaExpSol" 
+                    #horaExpSol="ngModel" required>
+                  <label class="form-check-label" for="horaExpSol3">Ambas</label>
+                </div>
+              </div>
+              <!-- INPUT EXPOSICAO -->
+            </div>
+          
+            <div *ngIf="!horaExpSol.valid && horaExpSol.touched" class="invalido">
+              Horario de exposição ao sol não informado.
+            </div>
+          </div>
+          <!-- FIM FORMGROUP - EXPOSICAO -->
+          </div>
+
+          <div class="row">
+          <!-- FORMGROUP - CHAPEU -->
+          <div class="form-group col-lg-6">
+            <label for="usoChapeu1"><strong>Quando no sol, usa chapéu?</strong></label>
+            <div class="input-group">
+          
+              <!-- INPUT CHAPEU -->
+              <div class="col-form-label">
+                <div class="form-check form-check-inline mr-4">
+                  <input class="form-check-input" id="usoChapeu1" type="radio" value="S" name="usoChapeu" [ngModel]="pac.usoChapeu" #usoChapeu="ngModel"
+                    required>
+                  <label class="form-check-label" for="usoChapeu1">Sim</label>
+                </div>
+                <div class="form-check form-check-inline mr-4">
+                  <input class="form-check-input" id="usoChapeu2" type="radio" value="N" name="usoChapeu" [ngModel]="pac.usoChapeu" #usoChapeu="ngModel"
+                    required>
+                  <label class="form-check-label" for="usoChapeu2">Não</label>
+                </div>
+              </div>
+              <!-- INPUT CHAPEU -->
+            </div>
+          
+            <div *ngIf="!usoChapeu.valid && usoChapeu.touched" class="invalido">
+              Uso de chapéu não informado.
+            </div>
+          </div>
+          <!-- FIM FORMGROUP - CHAPEU -->
+
+          <!-- FORMGROUP - MANGA COMPRIDA -->
+          <div class="form-group col-lg-6">
+            <label for="usoMangaCumprida1"><strong>Quando no sol, usa camisa de mangas compridas?</strong></label>
+            <div class="input-group">
+          
+              <!-- INPUT MANGA COMPRIDA -->
+              <div class="col-form-label">
+                <div class="form-check form-check-inline mr-4">
+                  <input class="form-check-input" id="usoMangaCumprida1" type="radio" value="S" name="usoMangaCumprida" [ngModel]="pac.usoMangaCumprida" #usoMangaCumprida="ngModel"
+                    required>
+                  <label class="form-check-label" for="usoMangaCumprida1">Sim</label>
+                </div>
+                <div class="form-check form-check-inline mr-4">
+                  <input class="form-check-input" id="usoMangaCumprida2" type="radio" value="N" name="usoMangaCumprida" [ngModel]="pac.usoMangaCumprida" #usoMangaCumprida="ngModel"
+                    required>
+                  <label class="form-check-label" for="usoMangaCumprida2">Não</label>
+                </div>
+              </div>
+              <!-- INPUT MANGA COMPRIDA -->
+            </div>
+          
+            <div *ngIf="!usoMangaCumprida.valid && usoMangaCumprida.touched" class="invalido">
+              Uso de mangas compridas não informado.
+            </div>
+          </div>
+          <!-- FIM FORMGROUP - MANGA COMPRIDA -->
+          </div>
+
+          <div class="row">
+          <!-- FORMGROUP - CALCA COMPRIDA -->
+          <div class="form-group col-lg-6">
+            <label for="usoCalcaCumprida1"><strong>Quando no sol, usa calças compridas?</strong></label>
+            <div class="input-group">
+          
+              <!-- INPUT CALCA COMPRIDA -->
+              <div class="col-form-label">
+                <div class="form-check form-check-inline mr-4">
+                  <input class="form-check-input" id="usoCalcaCumprida1" type="radio" value="S" name="usoCalcaCumprida" [ngModel]="pac.usoCalcaCumprida" #usoCalcaCumprida="ngModel"
+                    required>
+                  <label class="form-check-label" for="usoCalcaCumprida1">Sim</label>
+                </div>
+                <div class="form-check form-check-inline mr-4">
+                  <input class="form-check-input" id="usoCalcaCumprida2" type="radio" value="N" name="usoCalcaCumprida" [ngModel]="pac.usoCalcaCumprida" #usoCalcaCumprida="ngModel"
+                    required>
+                  <label class="form-check-label" for="usoCalcaCumprida2">Não</label>
+                </div>
+              </div>
+              <!-- INPUT CALCA COMPRIDA -->
+            </div>
+          
+            <div *ngIf="!usoCalcaCumprida.valid && usoCalcaCumprida.touched" class="invalido">
+              Uso de calças compridas não informado.
+            </div>
+          </div>
+          <!-- FIM FORMGROUP - CALCA COMPRIDA -->
+
+          <!-- FORMGROUP - FILTRO SOLAR -->
+          <div class="form-group col-lg-6">
+            <label for="usoFiltroSolar1"><strong>Quando no sol, usa filtro solar?</strong></label>
+            <div class="input-group">
+          
+              <!-- INPUT FILTRO SOLAR -->
+              <div class="col-form-label">
+                <div class="form-check form-check-inline mr-4">
+                  <input class="form-check-input" id="usoFiltroSolar1" type="radio" value="S" name="usoFiltroSolar" [ngModel]="pac.usoFiltroSolar" #usoFiltroSolar="ngModel"
+                    required>
+                  <label class="form-check-label" for="usoFiltroSolar1">Sim</label>
+                </div>
+                <div class="form-check form-check-inline mr-4">
+                  <input class="form-check-input" id="usoFiltroSolar2" type="radio" value="N" name="usoFiltroSolar" [ngModel]="pac.usoFiltroSolar" #usoFiltroSolar="ngModel"
+                    required>
+                  <label class="form-check-label" for="usoFiltroSolar2">Não</label>
+                </div>
+              </div>
+              <!-- INPUT FILTRO SOLAR -->
+            </div>
+          
+            <div *ngIf="!usoFiltroSolar.valid && usoFiltroSolar.touched" class="invalido">
+              Uso de filtro solar não informado.
+            </div>
+          </div>
+          <!-- FIM FORMGROUP - FILTRO SOLAR -->
+          </div>
+          
+          <div class="row">
+          <!-- FORMGROUP - FAMILIA MATERNA -->
+          <div class="form-group col-lg-6">
+            <label for="origemFamiliarMae"><strong>Origem familiar materna:</strong></label>
+            <div class="input-group">
+              <!-- INPUT FAMILIA MATERNA -->
+              <input type="text" class="form-control" id="origemFamiliarMae" name="origemFamiliarMae"
+              required minlength=1 [ngModel]="origemMae" #origemFamiliarMae="ngModel" [ngbTypeahead]="listaOrigem">
+              <!-- INPUT FAMILIA MATERNA -->
+          
+              <!-- <div class="input-group-prepend">
+                <span class="input-group-text"><i class="fa fa-envelope"></i></span>
+              </div> -->
+            </div>
+          
+            <div *ngIf="!origemFamiliarMae.valid && origemFamiliarMae.touched" class="invalido">
+              Origem familiar materna não informada.
+            </div>
+          </div>
+          <!-- FIM FORMGROUP - FAMILIA MATERNA -->
+
+          <!-- FORMGROUP - FAMILIA PATERNA -->
+          <div class="form-group col-lg-6">
+            <label for="origemFamiliarPai"><strong>Origem familiar paterna:</strong></label>
+            <div class="input-group">
+              <!-- INPUT FAMILIA PATERNA -->
+              <input type="text" class="form-control" id="origemFamiliarPai" name="origemFamiliarPai" required minlength=1
+                [ngModel]="origemPai" #origemFamiliarPai="ngModel" [ngbTypeahead]="listaOrigem">
+              <!-- INPUT FAMILIA PATERNA -->
+          
+              <!-- <div class="input-group-prepend">
+                <span class="input-group-text"><i class="fa fa-envelope"></i></span>
+              </div> -->
+            </div>
+          
+            <div *ngIf="!origemFamiliarPai.valid && origemFamiliarPai.touched" class="invalido">
+              Origem familiar paterna não informada.
+            </div>
+          </div>
+          <!-- FIM FORMGROUP - FAMILIA PATERNA -->
+          </div>
+
+          <div class="row">
+          <!-- FORMGROUP - HISTORICO CANCER PELE -->
+          <div class="form-group col-lg-6">
+            <label for="histCancerPele1"><strong>Possui histórico de câncer de pele na família?</strong></label>
+            <div class="input-group">
+          
+              <!-- INPUT HISTORICO CANCER PELE -->
+              <div class="col-form-label">
+                <div class="form-check form-check-inline mr-4">
+                  <input class="form-check-input" id="histCancerPele1" type="radio" value="S" name="histCancerPele" [ngModel]="pac.histCancerPele" 
+                    #histCancerPele="ngModel" required>
+                  <label class="form-check-label" for="histCancerPele1">Sim</label>
+                </div>
+                <div class="form-check form-check-inline mr-4">
+                  <input class="form-check-input" id="histCancerPele2" type="radio" value="N" name="histCancerPele" [ngModel]="pac.histCancerPele" 
+                    #histCancerPele="ngModel" required>
+                  <label class="form-check-label" for="histCancerPele2">Não</label>
+                </div>
+              </div>
+              <!-- INPUT HISTORICO CANCER PELE -->
+            </div>
+          
+            <div *ngIf="!histCancerPele.valid && histCancerPele.touched" class="invalido">
+              Histórico de câncer de pele não informado.
+            </div>
+          </div>
+          <!-- FIM FORMGROUP - HISTORICO CANCER PELE -->
+
+          <!-- FORMGROUP - HISTORICO CANCER -->
+          <div class="form-group col-lg-6">
+            <label for="histCancer1"><strong>Possui histórico de outro câncer na família?</strong></label>
+            <div class="input-group">
+          
+              <!-- INPUT HISTORICO CANCER -->
+              <div class="col-form-label">
+                <div class="form-check form-check-inline mr-4">
+                  <input class="form-check-input" id="histCancer1" type="radio" value="S" name="histCancer" [ngModel]="pac.histCancer" 
+                    #histCancer="ngModel" required>
+                  <label class="form-check-label" for="histCancer1">Sim</label>
+                </div>
+                <div class="form-check form-check-inline mr-4">
+                  <input class="form-check-input" id="histCancer2" type="radio" value="N" name="histCancer" [ngModel]="pac.histCancer" 
+                    #histCancer="ngModel" required>
+                  <label class="form-check-label" for="histCancer2">Não</label>
+                </div>
+              </div>
+              <!-- INPUT HISTORICO CANCER -->
+            </div>
+          
+            <div *ngIf="!histCancer.valid && histCancer.touched" class="invalido">
+              Histórico de câncer não informado.
+            </div>
+          </div>
+          <!-- FIM FORMGROUP - HISTORICO CANCER -->
+        </div>
+
+          <div class="row">
+          <!-- FORMGROUP - VEZES ATENDIDO -->
+          <div class="form-group col-lg-6">
+            <label for="numVezesAtendido"><strong>Já foi atendido pelo PAD anteriormente? Se sim, quantas vezes?</strong></label>
+            <div class="input-group">
+              <!-- INPUT VEZES ATENDIDO -->
+              <input type="number" min="0" class="form-control" id="numVezesAtendido" name="numVezesAtendido" required [ngModel]="pac.numVezesAtendido" #numVezesAtendido="ngModel">
+              <!-- INPUT VEZES ATENDIDO -->
+          
+              <!-- <div class="input-group-prepend">
+                <span class="input-group-text"><i class="fa fa-envelope"></i></span>
+              </div> -->
+            </div>
+          
+            <div *ngIf="!numVezesAtendido.valid && numVezesAtendido.touched" class="invalido">
+              Número de vezes atendido não informado.
+            </div>
+          </div>
+          <!-- FIM FORMGROUP - VEZES ATENDIDO -->
+
+          <!-- FORMGROUP - OBSERVACOES -->
+          <div class="form-group col-lg-6">
+            <label for="obs"><strong>Observações:</strong></label>
+            <div class="input-group">
+              <!-- INPUT OBSERVACOES -->
+                <textarea class="form-control" id="obs" name="obs" rows="3"
+                data-gramm="true" data-txt_gramm_id="156e527d-8c2d-2f4c-e7db-ff0a740d586d" 
+                data-gramm_id="156e527d-8c2d-2f4c-e7db-ff0a740d586d" spellcheck="false" data-gramm_editor="true" 
+                style="z-index: auto; position: relative; line-height: 21px; font-size: 14px; transition: none 0s ease 0s; background: transparent !important;"
+                required minlength=1 [ngModel]="observacoes" #obs="ngModel"></textarea>
+              <!-- INPUT OBSERVACOES -->
+          
+              <!-- <div class="input-group-prepend">
+                <span class="input-group-text"><i class="fa fa-envelope"></i></span>
+              </div> -->
+            </div>
+          
+            <div *ngIf="!obs.valid && obs.touched" class="invalido">
+              Observações não feitas.
+            </div>
+          </div>
+          <!-- FIM FORMGROUP - OBSERVACOES -->
+          </div>
+    
+        </div>
+        <!-- FIM CORPO SUB-CARD MAIS INFORMAÇÕES PESSOAIS -->
+    
+      </div>
+      <!-- FIM SUB-CARD MAIS INFORMAÇÕES PESSOAIS -->
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-12">
+      <!-- SUB-CARD DADOS TECNICOS -->
+      <div class="card">
+    
+        <!-- CABEÇALHO CARD DADOS TECNICOS -->
+        <div class="card-header">
+          <i class="fa fa-stethoscope"></i>
+          <strong>Dados clínicos</strong>
+        </div>
+    
+        <div class="card-body">
+
+          <div class="row">
+          <!-- FORMGROUP - PRESSAO SISTOLICA -->
+          <div class="form-group col-lg-6">
+            <label for="presArtSistolica"><strong>Pressão arterial sistólica:</strong></label>
+            <div class="input-group">
+              <!-- INPUT PRESSAO SISTOLICA -->
+              <input type="number" min="0" class="form-control" id="presArtSistolica" name="presArtSistolica" required
+                [ngModel]="pac.presArtSistolica" #presArtSistolica="ngModel">
+              <!-- INPUT PRESSAO SISTOLICA -->
+  
+              <!-- <div class="input-group-prepend">
+                <span class="input-group-text"><i class="fa fa-envelope"></i></span>
+              </div> -->
+            </div>
+  
+            <div *ngIf="!presArtSistolica.valid && presArtSistolica.touched" class="invalido">
+              Pressão arterial sistólica não foi informada.
+            </div>
+          </div>
+          <!-- FIM FORMGROUP - PRESSAO SISTOLICA -->
+
+          <!-- FORMGROUP - PRESSAO DIASTOLICA -->
+          <div class="form-group col-lg-6">
+            <label for="presArtDiastolica"><strong>Pressão arterial diastólica:</strong></label>
+            <div class="input-group">
+              <!-- INPUT PRESSAO DIASTOLICA -->
+              <input type="number" min="0" class="form-control" id="presArtDiastolica" name="presArtDiastolica" required [ngModel]="pac.presArtDiastolica" 
+                #presArtDiastolica="ngModel">
+              <!-- INPUT PRESSAO DIASTOLICA -->
+          
+              <!-- <div class="input-group-prepend">
+                <span class="input-group-text"><i class="fa fa-envelope"></i></span>
+              </div> -->
+            </div>
+          
+            <div *ngIf="!presArtDiastolica.valid && presArtDiastolica.touched" class="invalido">
+              Pressão arterial diastólica não foi informada.
+            </div>
+          </div>
+          <!-- FIM FORMGROUP - PRESSAO DIASTOLICA -->
+          </div>
+
+          <div class="row">
+          <!-- FORMGROUP - HAS -->
+          <div class="form-group col-lg-4">
+            <label for="hipertensao1"><strong>Hipertensão (HAS):</strong></label>
+            <div class="input-group">
+          
+              <!-- INPUT HAS -->
+              <div class="col-form-label">
+                <div class="form-check form-check-inline mr-4">
+                  <input class="form-check-input" id="hipertensao1" type="radio" value="S" name="hipertensao" [ngModel]="pac.hipertensao" #hipertensao="ngModel"
+                    required>
+                  <label class="form-check-label" for="hipertensao1">Sim</label>
+                </div>
+                <div class="form-check form-check-inline mr-4">
+                  <input class="form-check-input" id="hipertensao2" type="radio" value="N" name="hipertensao" [ngModel]="pac.hipertensao" #hipertensao="ngModel"
+                    required>
+                  <label class="form-check-label" for="hipertensao2">Não</label>
+                </div>
+              </div>
+              <!-- INPUT HAS -->
+            </div>
+          
+            <div *ngIf="!hipertensao.valid && hipertensao.touched" class="invalido">
+              HAS não informado
+            </div>
+          </div>
+          <!-- FIM FORMGROUP - HAS -->
+
+          <!-- FORMGROUP - DIABETES -->
+          <div class="form-group col-lg-4">
+            <label for="diabetes1"><strong>Paciente possui diabetes?</strong></label>
+            <div class="input-group">
+          
+              <!-- INPUT DIABETES -->
+              <div class="col-form-label">
+                <div class="form-check form-check-inline mr-4">
+                  <input class="form-check-input" id="diabetes1" type="radio" value="S" name="diabetes" [ngModel]="pac.diabetes" #diabetes="ngModel"
+                    required>
+                  <label class="form-check-label" for="diabetes1">Sim</label>
+                </div>
+                <div class="form-check form-check-inline mr-4">
+                  <input class="form-check-input" id="diabetes2" type="radio" value="N" name="diabetes" [ngModel]="pac.diabetes" #diabetes="ngModel"
+                    required>
+                  <label class="form-check-label" for="diabetes2">Não</label>
+                </div>
+              </div>
+              <!-- INPUT DIABETES -->
+            </div>
+          
+            <div *ngIf="!diabetes.valid && diabetes.touched" class="invalido">
+              Presença de diabetes não informada.
+            </div>
+          </div>
+          <!-- FIM FORMGROUP - DIABETES -->
+
+          <!-- FORMGROUP - ANTICOAGULANTE -->
+          <div class="form-group col-lg-4">
+            <label for="usoAnticoagulante1"><strong>Uso de anticoagulante nos últimos 7 dias?</strong></label>
+            <div class="input-group">
+          
+              <!-- INPUT ANTICOAGULANTE -->
+              <div class="col-form-label">
+                <div class="form-check form-check-inline mr-4">
+                  <input class="form-check-input" id="usoAnticoagulante1" type="radio" value="S" name="usoAnticoagulante" [ngModel]="pac.usoAnticoagulante" #usoAnticoagulante="ngModel"
+                    required>
+                  <label class="form-check-label" for="usoAnticoagulante1">Sim</label>
+                </div>
+                <div class="form-check form-check-inline mr-4">
+                  <input class="form-check-input" id="usoAnticoagulante2" type="radio" value="N" name="usoAnticoagulante" [ngModel]="pac.usoAnticoagulante" #usoAnticoagulante="ngModel"
+                    required>
+                  <label class="form-check-label" for="usoAnticoagulante2">Não</label>
+                </div>
+              </div>
+              <!-- INPUT ANTICOAGULANTE -->
+            </div>
+          
+            <div *ngIf="!usoAnticoagulante.valid && usoAnticoagulante.touched" class="invalido">
+              Anticoagulante não informado.
+            </div>
+          </div>
+          <!-- FIM FORMGROUP - ANTICOAGULANTE -->
+          </div>
+
+          <div class="row">
+          <!-- FORMGROUP - ALERGIA -->
+          <div class="form-group col-lg-6">
+            <label for="alergia"><strong>Paciente possui alergia a algum medicamento?</strong></label>
+            <div class="input-group">
+              <!-- INPUT ALERGIA -->
+              <input type="text" class="form-control" id="alergia" name="alergia" required minlength=1
+                [ngModel]="iniAlergia" #alergia="ngModel">
+              <!-- INPUT ALERGIA -->
+          
+              <!-- <div class="input-group-prepend">
+                <span class="input-group-text"><i class="fa fa-envelope"></i></span>
+              </div> -->
+            </div>
+          
+            <div *ngIf="!alergia.valid && alergia.touched" class="invalido">
+              Alergia não foi informada.
+            </div>
+          </div>
+          <!-- FIM FORMGROUP - ALERGIA -->
+          </div>
+    
+        </div>
+        <!-- FIM CORPO SUB-CARD DADOS TECNICOS -->
+        <div class="card-footer">
+          <!-- BUTTON SUBMISSAO -->
+          <button 
+          type="submit"
+          class="btn btn-success btn-lg"
+          [disabled]="dadosCadastroForm.invalid || cartaoJaExiste">
+            Cadastrar
+            <i class="cui-check"></i>
+          </button>
+          <!-- BUTTON SUBMISSAO -->
+        </div>
+    
+      </div>
+      <!-- FIM SUB-CARD DADOS TECNICOS -->
+      </div>
+    </div>
+  </form>
+  <!-- FIM FORMULARIO -->
+</div>
+
+<!-- MODAL PARA SUCESSO/FALHA SUBMIT -->
+<div bsModal #modalSucFalha="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 *ngIf="flagRespostaCadastro === 'false'" class="modal-title"> Enviando paciente... </h4>
+        <h4 *ngIf="flagRespostaCadastro === 'problema-requisicao'" class="modal-title"> Falha no cadastro </h4>
+        <h4 *ngIf="flagRespostaCadastro === 'paciente-cadastrado'" class="modal-title"> Paciente cadastrado com sucesso </h4>
+        <button type="button" class="close" (click)="modalSucFalha.hide()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div *ngIf="flagRespostaCadastro !== 'false'">
+          <div *ngIf="flagRespostaCadastro === 'problema-requisicao'" class="alert alert-danger" role="alert">
+            Houve um problema na comunicação com o banco de dados. Tente mais tarde ou entre em contado com os
+            desenvolvedores.
+          </div>
+          <div *ngIf="flagRespostaCadastro === 'paciente-cadastrado'" class="alert alert-success" role="alert">
+            O paciente {{ pacienteCadastrado }} foi cadastrado com sucesso! Deseja adicionar lesões a esse paciente?
+          </div>
+        </div>
+        <div *ngIf="flagRespostaCadastro === 'false'">
+          <div class="d-flex justify-content-center">
+            <div class="spinner-border" role="status">
+              <span class="sr-only">Carregando...</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button *ngIf="flagRespostaCadastro === 'paciente-cadastrado'" type="button" class="btn btn-success" routerLink="/dashboard/paciente-cirurgia/nova-lesao/{{susCadastrado}}">
+          Adicionar lesões
+        </button>
+      
+      
+        <button type="button" class="btn btn-danger" (click)="modalSucFalha.hide()">
+          Fechar
+        </button>
+      
+      </div>
+
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+<!-- MODAL PARA SUCESSO/FALHA SUBMIT -->
+
+
+<!-- MODAL PARA PACIENTE ENCONTRADO -->
+<div bsModal #modalPaciente="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title"> Paciente já cadastrado </h4>
+        <button type="button" class="close" (click)="modalPaciente.hide()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="alert alert-success" role="alert">
+          <p align="justify">
+          Este paciente já foi cadastrado no banco em alguma das viagens passadas do PAD. Portanto, não existe necessidade de
+          realizar todo o cadastro novamente.
+          <br><br>
+          Atualize apenas o necessário. A data deste atendimento e a quantidade de vezes que ele foi atendido pelo PAD serão
+          atualizados automaticamente.
+          <br><br>
+          Ações que você deve tomar:<br>
+          - Verificar a cidade de atendimento: pode ser que o paciente está sendo atendido em uma cidade diferente do
+          antendimento anterior, por favor coloque a cidade atual.<br>
+          - Verificar se o endereço do paciente é o mesmo.<br>
+          - Atualize TODOS os dados técnicos, como pressão, alergia a medicamento etc.<br>
+          - Em hipótese alguma mexa nos dados das lesões já cadastradas.<br>
+          <br>
+          Qualquer dúvida procure ajuda com o TI.
+          </p>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" (click)="modalPaciente.hide()">
+          Fechar
+        </button>
+
+      </div>
+
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+<!-- MODAL PARA SUCESSO/FALHA SUBMIT -->
+
+<!-- MODAL PARA CONFIRMAR EDICAO -->
+<div bsModal #modalEdicao="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title"> Deseja confirmar a edição? </h4>
+        <button type="button" class="close" (click)="modalEdicao.hide()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="alert alert-warning" role="alert">
+          Confira os dados antes de confirmar a edição.
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-success" (click)="recebeCadastroForm()">
+          Confirmar
+        </button>
+      
+      
+        <button type="button" class="btn btn-danger" (click)="modalEdicao.hide()">
+          Fechar
+        </button>
+      
+      </div>
+
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+<!-- MODAL PARA SUCESSO/FALHA SUBMIT -->

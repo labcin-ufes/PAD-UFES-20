@@ -1,0 +1,22 @@
+.clark-check-box{
+    margin-right: 8px;
+    margin-left: 4px;
+    transform:scale(1.6);
+}
+
+input.ng-invalid.ng-touched {
+    border: 1px solid red;
+}
+
+input.ng-valid.ng-touched {
+    border-color: #4dbd74;  
+}
+
+select.ng-valid.ng-touched {
+    border-color: #4dbd74; 
+}
+
+select.ng-invalid.ng-touched {
+    border: 1px solid red;
+}
+

@@ -1,0 +1,44 @@
+<div class="animated fadeIn">
+    <div class="row" *ngIf="!editando">
+        <div class="col-lg-12">
+            
+            <app-auditoria-listar 
+                [tipoPac]="tipoPac"
+                (eventoPacSelecionado)="pegaEventoPacSelecionado($event)"
+                [respAuditoria]="respAuditoria"
+                [respListarLesoes]="respListarLesoes"
+            >
+            </app-auditoria-listar>
+
+        </div>
+    </div>
+
+    <div class="row" *ngIf="!editando">
+        <div class="col-lg-12">
+            
+            <app-auditoria-listar-lesoes 
+                    [urlLesoes]="urlLesoesCirurgia"
+                    [tipoPac]="tipoPac"
+                    (eventoLesSelecionada)="pegaEventoLesSelecionada($event)"
+                    (eventoRespListarLesoes)="pegaEventoRespListarLesoes($event)"
+                    [respAuditoria]="respAuditoria"
+            >
+            </app-auditoria-listar-lesoes>
+
+        </div>
+    </div>
+
+    <div class="row" *ngIf="editando">
+        <div class="col-lg-12">
+
+            <app-auditoria-edicao
+                [urlLesao]="urlLesaoCirurgia"
+                [tipoPac]="tipoPac"
+                (eventoRespAuditoriaDeEdicaoPai)="pegaEventoRespAuditoriaDeEdicaoPai($event)"
+            >
+            </app-auditoria-edicao>
+
+        </div>
+    </div>  
+    
+</div>

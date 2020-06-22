@@ -1,0 +1,21 @@
+.ng-invalid.ng-touched:not(form) {
+    border: 1px solid red;
+}
+
+.invalido {
+    font-size: 0.8em;
+    padding: 2px;
+    color: red;
+}
+
+#botaoCadastrar{
+    margin-top: 20px;
+}
+
+.btn-info {
+    color: #FFF;    
+} 
+
+.btn-sm{    
+    margin-left: 5px;
+}

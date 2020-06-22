@@ -1,0 +1,70 @@
+<div class="app-body vert-center">
+  <main class="main d-flex align-items-center">
+    <div class="container">  
+      <!--CARD PARA TERMOS DE USO-->
+        <div class = "row">
+          <div class="col-md-12">
+
+             <!-- CARD PARA CASO DE FALHA NA REQUISICAO  -->
+            <div class="row" *ngIf="falhaReq">
+                <div class="col-lg-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <span> <strong>Falha de comunicação</strong><i class="fa fa-exclamation-triangle"></i> </span>                        
+                        </div>
+          
+                        <div class="card-body">
+                            <div class="alert alert-danger text-center" role="alert">
+                                Infelizmente ocorreu uma falha de comunicação. Tente acessar mais tarde. Caso persista, entre em contato
+                                com os desenvolvedores.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+              </div>
+              <!-- CARD PARA CASO DE FALHA NA REQUISICAO  -->
+
+            <div class="card" *ngIf="!falhaReq">
+
+                <!-- TÍTULO -->
+                <div class="card-header">
+                  <span>
+                      <i class="fa fa-book"></i>
+                    <strong>{{ termos.titulo }}</strong>&nbsp;
+                    
+                  </span>
+                </div>
+                
+                  <!-- CORPO -->
+                <div class="card-body">
+
+                    <div class="row">
+                      <div class="col">
+                        <button 
+                        type="button"
+                        class="btn btn-link"
+                        style="margin-left: -15px; margin-bottom: 10px;"
+                        routerLink="/login">
+                          <i class="fa fa-arrow-left"></i>
+                          Voltar                    
+                        </button>
+                      </div>
+                    </div>
+                    
+                    <div class="row">
+                      <div class="col">
+  
+                        <div [innerHTML]="termos.texto"></div>
+                        
+                      </div>
+                    </div>                  
+                  </div>
+
+            </div>
+          </div>
+        </div>
+      <!--FIM CARD TERMOS DE USO-->
+
+    </div>
+  </main>
+</div>

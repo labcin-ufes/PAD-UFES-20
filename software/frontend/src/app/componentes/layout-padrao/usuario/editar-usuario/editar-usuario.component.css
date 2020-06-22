@@ -1,0 +1,24 @@
+.tituloTabela {
+    font-weight: bold;
+    font-size: 15px;
+}
+
+.container {
+    margin-top: 30px;
+}
+
+.container label{
+    font-weight: bold;
+}
+
+#btn-atualizar {
+    margin-top: 55px;
+}
+
+input.ng-invalid.ng-touched {
+    border: 1px solid red;
+}
+
+input.ng-valid.ng-touched {
+    border-color: #4dbd74;  
+}

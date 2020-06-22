@@ -1,0 +1,133 @@
+<!-- CASO A OCORRA ALGUMA FALHA -->
+<div class="card .mx-auto" *ngIf="flagFalha">
+    <div class="card-header">
+        <h4> Falha de comunicação </h4>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-danger text-center" role="alert">                        
+            Infelizmente ocorreu uma falha de comunicação no sistema. Tente acessar novamente ou mais tarde. Caso persista, entre em contato com os desenvolvedores
+        </div>
+    </div>
+</div>
+<!-- CASO A OCORRA ALGUMA FALHA -->
+
+<div class="card" *ngIf="urlLesoes !== undefined && !flagFalha">
+
+    <div class="card-header">
+        <i class="fa fa-list"></i>
+        <strong> Lesões não auditadas do paciente selecionado </strong>
+    </div>
+
+    <div class="card-body" *ngIf="lesoes === undefined">
+        <div class="alert alert-warning text-center">
+            O paciente selecionado não possui nenhuma lesão cadastrada!
+        </div>
+    </div>
+
+    <div class="card-body" *ngIf="lesoes !== undefined && respAuditoria !== 'paciente-checked'">
+
+        <!-- ALERTS -->
+        <div class="row">
+
+            <div class="alert alert-danger text-center col-12" role="alert" *ngIf="respAuditoria === 'auditoria-lesao-falha'">
+                <strong> Ocorreu alguma falha de comunicação! Verifique os logs! </strong>
+            </div> 
+
+            <div class="alert alert-success text-center col-12" role="alert" *ngIf="respAuditoria === 'auditoria-lesao-excluida'">
+                <strong> Lesão excluída com sucesso! </strong>
+            </div> 
+
+            <div class="alert alert-success text-center col-12" role="alert" *ngIf="respAuditoria === 'auditoria-lesao-auditada'">
+                <strong> Lesão auditada com sucesso! </strong>
+            </div> 
+
+            <div class="alert alert-warning text-center col-12" role="alert" *ngIf="pacSemLesao && !flagFalha && !pacApagado">
+                <strong> 
+                    Paciente sem lesão cadastrada! 
+                    <br/>
+                    <button
+                        type="button"
+                        class="btn btn-outline-danger"
+                        (click)="excluirPacSemLesao()"
+                    >
+                        Excluir paciente
+                        <i class="fa fa-trash"></i>
+                    </button>
+                </strong>
+            </div>
+
+            <div class="alert alert-success text-center col-12" role="alert" *ngIf="pacSemLesao && pacApagado && !flagFalha">
+                <strong> Paciente apagado com sucesso! </strong>
+            </div>             
+
+        </div>
+        <!-- ALERTS -->
+
+        <table class="table table-striped" *ngIf="tipoPac === 'cirurgia' && !pacSemLesao">                            
+            <thead>
+                <tr>
+                    <th>Diagnóstico</th>
+                    <th>Região</th> 
+                    <th>Diâmetro menor</th>     
+                    <th>Diâmetro maior</th>     
+                    <th>Local de atendimento</th>                                                    
+                    <th>Data</th>
+                    <th>Auditar</th>
+                </tr>
+            </thead>
+
+            <tbody *ngFor="let lesao of lesoes">
+                <tr *ngIf="!lesao.auditado">
+                    <td>{{ lesao.diagnosticoClinico }}</td>
+                    <td>{{ lesao.regiao }}</td>
+                    <td>{{ lesao.diametroMenor }}</td>
+                    <td>{{ lesao.diametroMaior }}</td>
+                    <td>{{ lesao.localProcedimento }}</td>                                                
+                    <td>{{ lesao.dataProcedimento | dataStr }}</td>                                                
+                    <td>
+                            <button
+                                type="button"
+                                class="btn btn-warning"
+                                (click)="emiteLesSelecionado(lesao._links.self.href)"
+                            >
+                            <i class="fa fa-crop custom"></i>
+                            </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        
+        <table class="table table-striped" *ngIf="tipoPac === 'dermato' && !pacSemLesao">                            
+            <thead>
+                <tr>
+                    <th> Diagnóstico </th>
+                    <th> Idade </th>
+                    <th> Região </th>
+                    <th> Auditar </th>
+                </tr>
+            </thead>
+
+            <tbody *ngFor="let lesao of lesoes">
+                <tr *ngIf="!lesao.auditado">
+                    <td>{{ lesao.diagnostico }}</td>                                              
+                    <td>{{ lesao.idade }}</td> 
+                    <td>{{ lesao.regiao }}</td> 
+                    <td>
+                            <button
+                                type="button"
+                                class="btn btn-warning"
+                                (click)="emiteLesSelecionado(lesao._links.self.href)"
+                                
+                            >
+                            <i class="fa fa-recycle"></i>
+                            </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>            
+
+    </div>
+
+
+</div>

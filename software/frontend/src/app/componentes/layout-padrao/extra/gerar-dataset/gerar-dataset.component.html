@@ -1,0 +1,211 @@
+<div class="animated fadeIn">
+    <div class="row">
+        <div class="col-lg-12">
+
+            <div class="card">
+                <div class="card-header">
+                    <i class="fa fa-file-text"></i>     
+                    <strong> Gerar dataset </strong>
+                </div>
+
+                <div class="card-body">
+                    
+                    <div>
+                        <tabset>
+                            <tab id="cirurgia" (select)="onSelect($event)">
+                                <ng-template tabHeading>
+                                    <strong>Dataset Cirurgia</strong>
+                                </ng-template>
+
+                                <div class="card">
+                                    <div class="card-header">
+                                        <label style="padding-left: 20px">
+                                            <input class="form-check-input" type="checkbox" [(ngModel)]="features" (change)="selectAll()" /><strong>Features para classificação</strong>
+                                        </label>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="form-group row">
+                                            <div *ngFor="let p of featuresClass" class="form-check form-check-inline mr-4 col-lg-3" style="padding-left: 20px">
+                                                <label>
+                                                    <input class="form-check-input" type="checkbox" value="{{p.id}}" name="{{p.id}}" [(ngModel)]="p.check" (change)="checkifAllSelected()"/>{{p.name}}
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="card">
+                                    <div class="card-header">
+                                        <label style="padding-left: 20px">
+                                            <input class="form-check-input" type="checkbox" [(ngModel)]="pacCirurgiaAll" (change)="selectAll()"/><strong>Dados do paciente</strong>
+                                        </label>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="form-group row">
+                                            <!-- <label for="dataset">Selecione as informações do Dataset:</label> -->
+                                            <div *ngFor="let p of pacienteCirurgia" class="form-check form-check-inline mr-4 col-lg-3" style="padding-left: 20px">
+                                                <label>
+                                                    <input class="form-check-input" type="checkbox" value="{{p.id}}" name="{{p.id}}" [(ngModel)]="p.check" (change)="checkifAllSelected()"/>{{p.name}}
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="card">
+                                    <div class="card-header">
+                                        <label style="padding-left: 20px">
+                                            <input class="form-check-input" type="checkbox" [(ngModel)]="histoAll" (change)="selectAll()"/><strong>Dados do histopatológico</strong>
+                                        </label>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="form-group row">
+                                            <!-- <label for="dataset">Selecione as informações do Dataset:</label> -->
+                                            <div *ngFor="let p of histopatologico" class="form-check form-check-inline mr-4 col-lg-3" style="padding-left: 20px">
+                                                <label>
+                                                    <input class="form-check-input" type="checkbox" value="{{p.id}}" name="{{p.id}}" [(ngModel)]="p.check" (change)="checkifAllSelected()"/>{{p.name}}
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <button 
+                                    *ngIf="sincronizando === 'nao-comecou'"
+                                    type="button" 
+                                    class="btn btn-success"
+                                    (click)="gerarDatasetCirurgia('path')">
+                                    Gerar Dataset Cirurgia
+                                    <i class="fa fa-file-text"></i>
+                                </button>
+
+                                <button 
+                                    *ngIf="sincronizando === 'nao-comecou'"
+                                    type="button" 
+                                    class="btn btn-success"
+                                    style="float: right"
+                                    (click)="gerarDatasetCirurgia('')">
+                                    Gerar Dataset Cirurgia Sem Imagens
+                                    <i class="fa fa-file-text"></i>
+                                </button>
+
+                                <!-- DIV COM BARRA DE PROGRESSO DO ENVIO DAS IMAGENS -->
+                                <div style="margin-top: 25px;"
+                                *ngIf="sincronizando === 'gerando-dataset'">
+
+                                        <div class="row" *ngIf="dadosGerados !== '100%'">
+                                            <div class="col text-center">
+                                                <h5> 
+                                                    Gerando o dataset com os dados requeridos acima. Por favor, aguarde. 
+                                                </h5>
+                                            </div>
+                                        </div>
+
+                                        <div class="row" *ngIf="dadosGerados === '100%'">
+                                            <div class="col text-center">
+                                                <h4 style="color: #09723d;">  
+                                                    Dataset gerado com sucesso!
+                                                </h4>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col">
+                                                <div class="progress" style="height: 35px; font-weight: bold; font-size: 14px;">                
+                                                    <div 
+                                                        class="progress-bar"
+                                                        role="progressbar"
+                                                        [ngStyle]="{'width': dadosGerados}"                    
+                                                        aria-valuemin="0" aria-valuemax="100">
+                                                        
+                                                        {{dadosGerados}}
+                                                    
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                </div>
+                                <!-- DIV COM BARRA DE PROGRESSO DO ENVIO DAS IMAGENS -->     
+                            </tab>
+
+                            <tab (select)="onSelect($event)">
+                                <ng-template tabHeading>
+                                    <strong>Dataset Dermato</strong>
+                                </ng-template>
+
+                                <div class="form-group row">
+                                    <div *ngFor="let p of pacienteDermato" class="form-check form-check-inline mr-4 col-lg-3" style="padding-left: 20px">
+                                        <label>
+                                            <input class="form-check-input" type="checkbox" value="{{p.id}}" name="{{p.id}}" [(ngModel)]="p.check"/>{{p.name}}
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <button
+                                    *ngIf="sincronizando === 'nao-comecou'"
+                                    type="button" 
+                                    class="btn btn-success"
+                                    (click)="gerarDatasetDermato('path')">
+                                    Gerar Dataset Dermato
+                                <i class="fa fa-file-text"></i>
+                                </button>
+
+                                <button 
+                                    *ngIf="sincronizando === 'nao-comecou'"
+                                    type="button" 
+                                    class="btn btn-success"
+                                    style="float: right"
+                                    (click)="gerarDatasetDermato('')">
+                                    Gerar Dataset Dermato Sem Imagens
+                                    <i class="fa fa-file-text"></i>
+                                </button>
+
+                              <!-- DIV COM BARRA DE PROGRESSO DO ENVIO DAS IMAGENS -->
+                                <div style="margin-top: 25px;"
+                                *ngIf="sincronizando === 'gerando-dataset'">
+
+                                        <div class="row" *ngIf="dadosGerados !== '100%'">
+                                            <div class="col text-center">
+                                                <h5> 
+                                                    Gerando o dataset com os dados requeridos acima. Por favor, aguarde. 
+                                                </h5>
+                                            </div>
+                                        </div>
+
+                                        <div class="row" *ngIf="dadosGerados === '100%'">
+                                            <div class="col text-center">
+                                                <h4 style="color: #09723d;">  
+                                                    Dataset gerado com sucesso!
+                                                </h4>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col">
+                                                <div class="progress" style="height: 35px; font-weight: bold; font-size: 14px;">                
+                                                    <div 
+                                                        class="progress-bar"
+                                                        role="progressbar"
+                                                        [ngStyle]="{'width': dadosGerados}"                    
+                                                        aria-valuemin="0" aria-valuemax="100">
+                                                        
+                                                        {{dadosGerados}}
+                                                    
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                </div>
+                                <!-- DIV COM BARRA DE PROGRESSO DO ENVIO DAS IMAGENS -->
+                            </tab>
+                        </tabset>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

@@ -1,0 +1,12 @@
+input.ng-invalid.ng-touched {
+    border: 1px solid red;
+}
+
+input.ng-valid.ng-touched {
+    border-color: #4dbd74;  
+}
+
+.tituloTabela {
+    font-weight: bold;
+    font-size: 15px;
+}

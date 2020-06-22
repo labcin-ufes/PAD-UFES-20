@@ -1,0 +1,63 @@
+<div class="animated fadeIn">
+
+    <div class="card">
+
+        <div class="card-header">
+
+            <i class="fa fa-road"></i>
+            <strong> Bloqueio de rota durante PAD </strong>
+
+        </div>
+
+        <div class="card-body">
+
+            <div class="row">
+                <div class="col">
+                    <div class="alert alert-info" style="font-size: 15px;">
+
+                        <p>
+                            <span class="badge badge-warning"  style="font-size: 14px;">Aviso</span> O botão abaixo serve para desabilitar a entrada de usuário que não sejam SUPER durante uma realização de viagem do PAD.
+                            <br/><br/>Isto é feito para evitar que algum paciente seja cadastrado/alterado durante a viagem, podendo ocasionar em um erro de sincronização de dados ao final do retorno da mesma.
+                        </p>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+
+                    <div class="col-lg-1">
+                        <p> Viagem do PAD? </p>
+                    </div>
+
+                    <div class="col">
+                        <label class="switch switch-label switch-success">
+                            <input 
+                                type="checkbox" 
+                                class="switch-input"                                                 
+                                [ngModel]=this.flagViagem
+                                name="viagemPAD"
+                                (change)="alteraViagemPad(viagemPAD.checked)"
+                                #viagemPAD
+                            >
+                            <span 
+                                class="switch-slider" 
+                                data-checked="Sim" 
+                                data-unchecked="Não">
+                            </span>
+                        </label>
+                    </div>
+            </div>
+
+
+
+        </div>
+
+    </div>
+
+
+
+</div>
+
+
+

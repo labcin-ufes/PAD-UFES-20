@@ -1,0 +1,269 @@
+<div class="app-body">
+  <main class="main d-flex align-items-center">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-8 mx-auto">
+          <div class="card-group">
+            <div class="card p-4">
+              <div class="card-body">
+
+
+                <form
+                  #dadosLoginForm="ngForm"
+                  (ngSubmit)="recebeLoginForm()"
+                >
+                    <img src="assets/img/brand/logo.svg" style="width:80; height:40px;">
+                    <br>
+                    <br>
+                  <!-- <h1>Área restrita</h1> -->
+                  <p class="text-muted">Entre com seu nome de usuário e senha para acessar o sistema</p>
+
+                  <!-- INFORMACAO CASO O LOGIN FALHE -->
+                  <div *ngIf="flagFalhaLogin" class="alert alert-danger text-center" role="alert">
+                    Seu nome de usuário ou senha estão incorretos
+                  </div>
+                  <!-- INFORMACAO CASO O LOGIN FALHE -->
+
+                  <!-- INFORMACAO PARA RECUPERAÇÃO DE SENHA -->
+                  <div *ngIf="flagRecSenha !== 'false'">
+                    <div *ngIf="flagRecSenha === 'problema-banco' || flagRecSenha === 'nao-enviado'" class="alert alert-danger text-center" role="alert">
+                      Houve um problema na comunicação com o banco de dados. Tente mais tarde ou entre em contado com os desenvolvedores.
+                    </div>
+
+                    <div *ngIf="flagRecSenha === 'sem-cadastro'" class="alert alert-warning text-center" role="alert">
+                      O email fornecido não está cadastrado no banco. Tente outro email ou cadastre-se clicando no botão ao lado.
+                    </div>
+
+                    <div *ngIf="flagRecSenha === 'enviado'" class="alert alert-success text-center" role="alert">
+                      Um email foi enviado para o endereço fornecido. Siga as instruções descritas no corpo do mesmo e faça seu login.
+                    </div>
+                  </div>
+                  <!-- INFORMACAO PARA RECUPERACAO DE SENHA -->
+
+                  <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text"><i class="icon-user"></i></span>
+                    </div>
+                    
+                    <!-- INPUT NOME DE USUARIO -->                    
+                    <input 
+                      type="text" 
+                      class="form-control" 
+                      placeholder="Usuário" 
+                      autocomplete="username" 
+                      ngModel
+                      name="nomeUsuario"
+                      minlength="3"
+                      required>
+                    <!-- INPUT NOME DE USUARIO -->
+
+                  </div>                  
+
+                  <div class="input-group mb-4">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text"><i class="icon-lock"></i></span>
+                    </div>
+
+                    <!-- INPUT DA SENHA DO USUARIO -->
+                    <input 
+                      type="password" 
+                      class="form-control" 
+                      placeholder="Senha" 
+                      autocomplete="current-password" 
+                      name="senha"
+                      ngModel
+                      required>
+                    <!-- INPUT DA SENHA DO USUARIO -->
+
+                  </div>
+                  <div class="row">
+                    <div class="col-6">
+
+                      <!-- BOTAO DE ENVIO DOS DADOS -->
+                      <button 
+                        type="submit" 
+                        class="btn btn-primary px-4"
+                        [disabled]="dadosLoginForm.invalid">                        
+                        Login
+                        <i class="cui-check"></i>
+                      </button>
+                      <!-- BOTAO DE ENVIO DOS DADOS -->
+
+                    </div>
+
+                    <div class="col-6 text-right">
+
+                      <!-- BOTAO ESQUECEU SENHA -->
+                      <button 
+                        type="button" 
+                        class="btn btn-link px-0"
+                        data-toggle="modal" 
+                        (click)="modalRecSenha.show()">
+                          Esqueceu a senha?
+                      </button>
+                      <!-- BOTAO ESQUECEU SENHA -->
+
+                    </div>
+
+                  </div>
+
+
+                  
+                  <!-- ESSA DIV SO VAI APARECER SE A TELA FOR MUITO PEQUENA -->
+                  <div class="row text-center d-block d-xl-none d-lg-none">
+
+                    <div class="col" style="margin-top: 35px;">
+
+                        <button 
+                        type="button" 
+                        class="btn btn-link px-0 btn-block"
+                        routerLink="/login/cadastro-usuario">
+                          Nao possui cadastro? Clique aqui.
+                        </button>
+
+
+                        <div>
+                      
+                          <!-- INPUT TERMOS DE USO & POLITICAS DE PRIVACIDADE -->
+                          
+                            <p format_align_center>
+                              <a [routerLink]="['/termos-de-uso']" target="_blank">Termos de Uso</a> e
+                              <a [routerLink]="['/politica-privacidade']" target="_blank">Políticas de Privacidade</a>
+                            </p> 
+                            
+                          <!-- INPUT TERMOS DE USO & POLITICAS DE PRIVACIDADE -->
+    
+                        </div>
+
+                    </div>
+                   
+                  </div>
+                  <!-- ESSA DIV SO VAI APARECER SE A TELA FOR MUITO PEQUENA -->
+
+
+
+                </form>
+              </div>
+            </div>
+
+
+            <div class="card text-white bg-primary py-4 d-md-down-none" style="width:44%">
+              
+              <div class="card-body text-center">
+                
+                <div>
+                  <h2>Cadastrar no sistema</h2>
+                  <p>Caso você não tenha um nome de usuário e senha é necessário cadastrar no sistema e esperar pela liberação de um administrador. 
+                  Para realizar o cadastro, basta clicar no botão abaixo. Na sequência entre um contato com um administrador para liberar o seu acesso. </p>
+                  
+                  <!-- BOTAO DE CADASTRAR USUARIO -->
+                  <button 
+                    type="button"
+                    class="btn btn-outline-light btn-lg"
+                    routerLink="/login/cadastro-usuario">
+                    Cadastrar
+                    <i class="cui-note"></i>
+                  </button>
+                  <!-- BOTAO DE CADASTRAR USUARIO -->
+
+                  
+                  <div style="margin-top: 20px; ">
+
+
+                    <!-- INPUT TERMOS DE USO & POLITICAS DE PRIVACIDADE -->
+                      <p format_align_center >
+                          <a style ='color: #fff;' [routerLink]="['/termos-de-uso']" target="_blank">Termos de Uso</a> e
+                          <a style ='color: #fff;' [routerLink]="['/politica-privacidade']" target="_blank">Políticas de Privacidade</a>
+                        </p> 
+                        
+                      <!-- INPUT TERMOS DE USO & POLITICAS DE PRIVACIDADE -->
+
+                  </div>
+
+
+                </div>
+              </div>
+
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+
+<!-- MODAL PARA RECUPERAÇÃO DE SENHA -->
+<div bsModal #modalRecSenha="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title"> Recuperação de senha </h4>
+        <button type="button" class="close" (click)="modalRecSenha.hide()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+
+        <p>Para recuperar sua senha insira o seu email cadastrado. Vamos enviar um email de recuperação. Siga as instruções contidas nele </p>
+
+         <form
+          #dadosRecSenhaForm="ngForm"
+          (ngSubmit)="recebeRecSenhaForm()"                  
+        >
+
+          <div class="form-group md-2">
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <span class="input-group-text">@</span>
+              </div>
+
+              <!-- INPUT EMAIL -->
+              <input 
+                type="email" 
+                class="form-control" 
+                placeholder="Email"                        
+                name="email"
+                ngModel
+                email
+                #emailInput="ngModel"
+                required>
+              <!-- INPUT EMAIL -->
+
+              <div class="input-group-append" *ngIf="enviando">
+                <span class="input-group-text">
+                    <i class="fa fa-spinner fa-spin" style="color: #1e66bd;"></i>
+                </span>
+              </div>
+              
+            </div>
+            <small *ngIf="emailInput.invalid && emailInput.touched" class="form-text text-danger">Digite um email válido</small>
+          </div>
+
+        <div class="modal-footer">
+          <button 
+            type="submit" 
+            class="btn btn-success"
+            [disabled]="dadosRecSenhaForm.invalid || enviando">
+              Enviar
+          </button>
+
+          
+            <button 
+              type="button" 
+              class="btn btn-danger" 
+              (click)="modalRecSenha.hide()">
+                Fechar
+          </button>
+          
+        </div>
+
+        </form>
+      </div>
+
+
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+<!-- MODAL PARA RECUPERAÇÃO DE SENHA -->

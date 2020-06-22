@@ -1,0 +1,97 @@
+<div class="card">
+<div class="card-header">
+    <i class="fa fa-book"></i> 
+    <strong> Instruções de uso </strong>
+</div>
+<div class="card-body">
+<tabset>
+
+  <!-- PACIENTE CIRURGIA -->
+  <tab>
+    <ng-template tabHeading><i class="fa fa-address-card"></i></ng-template>
+    <h5><strong>Paciente cirurgia</strong></h5>
+    <p>
+      Esta aba é dedicada ao cadastro de informações relacionadas aos pacientes
+      encaminhados a cirurgia. Através do submenu é possível:
+    </p>
+      <ul>
+        <li>
+          Cadastrar novos pacientes
+        </li>
+
+        <li>
+          Adicionar nova lesão para pacientes cadastrados
+        </li>
+
+        <li>
+          Cadastrar histopatológico para as lesões já cadastradas
+        </li>
+
+        <li>
+          Editar um paciente já cadastrado
+        </li>
+
+        <li>
+          Filtrar informações dos pacientes e lesões cadastradas
+        </li>
+
+        <li>
+          Visualizar todas as informações de um paciente cadastrado
+        </li>
+      </ul>
+  </tab>
+
+  <!-- EXTRA -->
+  <tab>
+      <ng-template tabHeading><i class="fa fa-th-large"></i></ng-template>
+      <h5><strong>Painel de lesões</strong></h5>
+      <p>
+        Este módulo apresenta uma galeria com todas as lesões e suas imagens (se houver) dos pacientescadastrados no sistema.
+      </p>
+
+      <p>
+        É uma ótima opção para visualizar as lesões que estão no sistema e apurar a qualidade das mesmas.
+      </p>
+
+  </tab>  
+
+  <!-- ANÁLISE DE DADOS -->
+  <tab>
+    <ng-template tabHeading><i class="fa fa-area-chart"></i></ng-template>
+    <h5><strong>Análise de dados</strong></h5>
+    <p>
+        Nesta área será apresentada toda área de análise de dados dos pacientes e lesões cadastradas no sistema. 
+    </p>
+
+    <p>
+      Você encontrará gráficos, tabelas e conclusões em relação aos dados. Essa funcionalidade aida está em desenvolvimento e será disponibilizada
+      assim que estiver pronta.
+    </p>
+  </tab>  
+
+  <!-- USUÁRIO -->
+  <tab>
+    <ng-template tabHeading><i class="fa fa-user-md"></i></ng-template>
+    <h5><strong>Usuário</strong></h5>
+    <p>
+      Este módulo, como o próprio nome sugere, possui as funcionalidades relacionadas aos usuários do sistema. Através dela é possível:
+    </p>
+
+    <ul>
+      <li>
+        Caso você seja um ADMIN, é possível adicionar novos usuários no sistema. Neste caso, esses usuário já estarão aptos acessar o sistema.
+      </li>
+
+      <li>
+        Visualizar todos os usuários do sistema. Caso seja um ADMIN, você poderá conceder privilégios e acesso aos demais usuários.
+      </li>
+
+      <li>
+        Alterar os seus dados, como nome de usuário, email e senha.
+      </li>
+    </ul>
+  </tab>
+
+</tabset>
+</div>
+</div>

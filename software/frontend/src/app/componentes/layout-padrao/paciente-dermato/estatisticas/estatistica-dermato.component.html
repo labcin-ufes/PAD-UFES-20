@@ -1,0 +1,89 @@
+
+<div class="card">
+
+    <div class="card-header">
+        <i class="fa fa-pie-chart"></i> 
+        <strong> Estatísticas dermato</strong>
+    </div>
+
+    <div class="card-body">
+
+         <!-- CARD COM RESUMO DAS INFORMAÇÕES -->
+         <div class="row" *ngIf="!flagFalha">
+
+                <!-- NUMERO DE PACIENTES RETORNADOS -->
+                <div class="col-6 col-lg-4">
+                    <div class="card">
+                        <div class="card-body p-0 clearfix">
+                            <i class="fa fa-users bg-primary p-3 font-2xl mr-3 float-left"></i>
+                            <div class="h5 text-primary mb-0 pt-2"> {{this.numPacientes}} </div>
+                            <div class="text-muted text-uppercase font-weight-bold font-xs">Pacientes</div>
+                        </div>
+                    </div>
+                </div>
+                <!-- NUMERO DE PACIENTES RETORNADOS -->
+    
+                <!-- NUMERO DE CIRURGIAS RETORNADOS -->
+                <div class="col-6 col-lg-4">
+                    <div class="card">
+                        <div class="card-body p-0 clearfix">
+                            <i class="fa fa-medkit bg-success p-3 font-2xl mr-3 float-left"></i>
+                            <div class="h5 text-success mb-0 pt-2"> {{this.numLesoes}} </div>
+                            <div class="text-muted text-uppercase font-weight-bold font-xs">Lesões</div>
+                        </div>
+                    </div>
+                </div>
+                <!-- NUMERO DE CIRURGIAS RETORNADOS -->   
+    
+                <!-- NUMERO DE IMAGENS RETORNADOS -->
+                <div class="col-6 col-lg-4">
+                    <div class="card">
+                        <div class="card-body p-0 clearfix">
+                            <i class="fa fa-image bg-danger p-3 font-2xl mr-3 float-left"></i>
+                            <div class="h5 text-danger mb-0 pt-2"> {{this.numImagens}} </div>
+                            <div class="text-muted text-uppercase font-weight-bold font-xs">Imagens</div>
+                        </div>
+                    </div>
+                </div>
+                <!-- NUMERO DE IMAGENS RETORNADOS -->                     
+    
+            </div>
+            <!-- CARD COM RESUMO DAS INFORMAÇÕES -->
+
+            <div class="row">
+
+                <div class="col">
+                    <div style="display: block">
+                            <canvas baseChart
+                                    [datasets]="barChartData"
+                                    [labels]="barChartLabels"
+                                    [options]="barChartOptions"
+                                    [legend]="barChartLegend"
+                                    [colors]="chartColors"
+                                    [chartType]="barChartType">
+                            </canvas>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="row">
+
+                <div class="col">
+                    <div style="display: block">
+                            <canvas baseChart
+                                    [datasets]="barChartData"
+                                    [labels]="barChartLabels"
+                                    [options]="barChartOptions"
+                                    [legend]="barChartLegend"
+                                    [colors]="chartColors"
+                                    [chartType]="barChartType">
+                            </canvas>
+                    </div>
+                </div>
+            </div>
+
+    </div>
+
+
+</div>

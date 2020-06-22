@@ -1,0 +1,81 @@
+
+            <div class="modal-header">
+                <h4 class="modal-title pull-left"><i class="icon-eyeglass"></i> Lesão</h4>
+                <button type="button" class="close pull-right" aria-label="Close" (click)="bsModalRef.hide()">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="card">
+                        <!-- CARROSSEL -->
+                        <carousel *ngIf="imagens?.length" [showIndicators]="false">
+                            <slide *ngFor="let imagem of imagens">
+                                    
+                                    <img src="{{url_api}}/api/imagem/baixar?nomeImg={{imagem.path}}&tipo=dermato&largura=200&altura=200"
+                                    alt="Lesão"
+                                    class="card-img-top">
+                                    
+
+                                    <!-- BOTÃO DROPDOWN -->
+                                    <div class="btn-group float-right btndrop" dropdown>
+                                        <button dropdownToggle type="button"
+                                            class="btn btn-block btn-ghost-light dropdown-toggle"
+                                            style="opacity:0.7" [ngClass]="!imagens?.length?'btn-ghost-dark':''">
+                                            <i class="icon-settings"><span class="caret"></span></i>
+                                        </button>
+                                        <ul *dropdownMenu class="dropdown-menu dropdown-menu-right" role="menu">
+                                            <li role="menuitem">
+                                                <a class="dropdown-item" 
+                                                (click)="bsModalRef.hide()" 
+                                                href="{{url_api}}/api/imagem/baixar?nomeImg={{imagem.path}}&tipo=dermato"
+                                                target="_blank"                        
+                                                >
+                                                    Download
+                                                </a>
+                                            </li>
+                                        </ul>                                        
+                                    </div>
+                                    <!-- BOTÃO DROPDOWN -->
+                            </slide>
+                        </carousel>
+
+                         
+
+                        <div class="box alert-danger text-center" *ngIf="!imagens?.length">
+                            <p class="conteudo">Não existe imagens cadastradas nesta lesão.</p>
+                        </div>
+                        
+                        <!-- DADOS DA LESÃO -->
+                        <div class="card-footer card-estilo">
+
+                            <div class="row">
+                                <div class="col">
+                                    <h5> Dados da lesão: </h5>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="campo"><small>Região:</small><span>&nbsp;{{ lesao?.regiao }}</span></div>
+                                    <div class="campo"><small>Diag.:</small><span>&nbsp;{{ lesao?.diagnostico }}</span></div>
+                                    <div class="campo"><small>Diag. Secundário:</small><span>&nbsp;{{ lesao?.diagnosticoSecundario | nullData: '' }}</span></div>
+                                    <div class="campo"><small>Idade:</small><span>&nbsp;{{ lesao?.idade }}</span></div>
+                                    <div class="campo"><small>Obs.:</small><span>&nbsp;{{ lesao?.obs | nullData: 'NENHUMA' }}</span></div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="campo"><small>Cresceu:</small><span>&nbsp;{{ lesao?.cresceu }}</span></div>
+                                    <div class="campo"><small>Coçou:</small><span>&nbsp;{{ lesao?.cocou }}</span></div>
+                                    <div class="campo"><small>Sangrou:</small><span>&nbsp;{{ lesao?.sangrou }}</span></div>
+                                    <div class="campo"><small>Doeu:</small><span>&nbsp;{{ lesao?.doeu }}</span></div>
+                                    <div class="campo"><small>Mudou:</small><span>&nbsp;{{ lesao?.mudou }}</span></div>
+                                    <div class="campo"><small>Relevo:</small><span>&nbsp;{{ lesao?.relevo }}</span></div>                                    
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                </div>
+            </div>

@@ -1,0 +1,39 @@
+<!-- CASO A OCORRA ALGUMA FALHA -->
+<div class="card .mx-auto" *ngIf="flagFalha">
+    <div class="card-header">
+        <h4> Falha de comunicação </h4>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-danger text-center" role="alert">                        
+            Infelizmente ocorreu uma falha de comunicação no sistema. Tente acessar novamente ou mais tarde. Caso persista, entre em contato com os desenvolvedores
+        </div>
+    </div>
+</div>
+<!-- CASO A OCORRA ALGUMA FALHA -->
+
+
+<div *ngIf="!flagFalha">
+
+    <div *ngIf="lesaoPronta | async">
+        
+        <div *ngIf="tipoPac === 'dermato'">
+            <app-auditoria-edicao-dermato
+                [lesao]="lesao"
+                (eventoRespAuditoriaDeEdicao)="pegaEventoRespAuditoriaDeEdicao($event)"
+            >
+            </app-auditoria-edicao-dermato>
+        </div>
+
+        
+        <div *ngIf="tipoPac === 'cirurgia'">
+            <app-auditoria-edicao-cirurgia
+                [lesao]="lesao"
+                (eventoRespAuditoriaDeEdicao)="pegaEventoRespAuditoriaDeEdicao($event)"
+            >
+            </app-auditoria-edicao-cirurgia>
+        </div>
+        
+
+    </div>
+
+</div>

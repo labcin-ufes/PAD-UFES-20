@@ -1,0 +1,198 @@
+<!-- CASO A OCORRA ALGUMA FALHA -->
+<div class="card .mx-auto" *ngIf="flagFalha">
+    <div class="card-header">
+        <h4> Falha de comunicação </h4>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-danger text-center" role="alert">                        
+            Infelizmente ocorreu uma falha de comunicação no sistema. Tente acessar novamente ou mais tarde. Caso persista, entre em contato com os desenvolvedores
+        </div>
+    </div>
+</div>
+<!-- CASO A OCORRA ALGUMA FALHA -->
+
+<div class="card" *ngIf="!flagFalha">
+
+    <div class="card-header">        
+        <strong> Cropando a imagem </strong>
+        <i class="fa fa-scissors"></i>
+
+        <!-- POPOVER SOBRE A BUSCA -->
+        
+            <button 
+                class="btn btn-warning btn-sm float-right" 
+                placement="left" 
+                popover="A imagem cropada aparecerá ao lado e será atualizada sempre que você mudar a região de crop. Ao clicar salvar crop, a 
+                imagem do crop será salva e incluída a lesão em questão. Ao clicar finalizar, se houver uma imagem cropada salva, a imagem
+                original será removida da lesão e apagada do servidor. O número de imagens gerado é mostrado no canto superior direito."  
+                type="button">
+                <i class="fa fa-question"></i>
+            </button>
+        
+        <!-- POPOVER SOBRE A BUSCA -->
+
+
+    </div>
+
+    <div class="card-body">
+
+            <div class="row">
+                
+                <div class="col col-sm-12">
+
+                    <button 
+                    type="button"
+                    class="btn btn-info"
+                    (click)="modalFinalizar.show()"
+                    >
+                        <i class="fa fa-arrow-left"></i>
+                        Finalizar
+                    </button>
+
+                    <button 
+                        type="button"
+                        class="btn btn-success"
+                        style="margin-left: 5px;"
+                        (click)="modalSalvar.show()"
+                    >
+                        Salvar crop
+                        <i class="fa fa-save"></i>
+                    </button>
+
+                    <div class="float-right" >
+                        <strong> Imagens cropadas e salvas: </strong>
+                        <span class="badge badge-danger" *ngIf="numImgSalvas === 0" style="font-size: 18px;"> {{ numImgSalvas }} </span>
+                        <span class="badge badge-success" *ngIf="numImgSalvas !== 0" style="font-size: 18px;"> {{ numImgSalvas }} </span>
+                    </div>
+
+                </div>
+
+                
+            </div>
+
+            <div class="row" style="margin-top: 25px;">
+                    <div class="col-6">
+                        <h4> Imagem original </h4>
+                        <div>   
+                            <image-cropper                
+                                [imageBase64]="imageBase64"
+                                [maintainAspectRatio]="true"
+                                [aspectRatio]="4 / 4"
+                                format="png"
+                                (imageCropped)="pegaImagemCropada($event)"
+                            >
+                            </image-cropper>
+                        </div>
+                    </div>
+                
+                
+                    <div class="col-6">
+                    <h4> Imagem recortada </h4>
+                    <div>
+                        <img [src]="imagemCropada" class="img-fluid"/>
+                    </div>
+                </div>
+            </div>
+
+    </div>
+</div>
+
+
+<!-- MODAL SALVAR O CROP -->
+<div bsModal #modalSalvar="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title"> Tem certeza que deseja salvar este crop? </h5>
+                <button type="button" class="close" (click)="modalSalvar.hide()" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+        <div class="modal-body" style="padding: 35px;">
+
+            <p>
+                Ao clicar sim, a imagem cropada será salva no banco de dados e no servidor para a lesão que está sendo editada.
+            </p>
+
+            <div class="row float-right" >
+                <button
+                    type="button"
+                    class="btn btn-success"
+                    (click)="salvarImagemCropada(modalSalvar)"
+                >
+                    Sim
+                    <i class="fa fa-check"></i>
+                </button>
+
+                <button
+                    style="margin-left: 15px;"
+                    type="button"
+                    class="btn btn-danger"
+                    (click)="modalSalvar.hide()"
+                >
+                    Não
+                    <i class="fa fa-close"></i>
+                </button>
+            </div>
+            
+        </div>
+
+        </div>
+    </div>
+</div>
+<!-- MODAL SALVAR O CROP -->
+
+
+<!-- MODAL FINALIZAR O CROP -->
+<div bsModal #modalFinalizar="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title"> Tem certeza que deseja finalizar o crop e voltar para tela anterior? </h5>
+                <button type="button" class="close" (click)="modalFinalizar.hide()" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+        <div class="modal-body" style="padding: 35px;">
+
+            <p *ngIf="numImgSalvas === 0">
+                Nenhuma imagem foi cropada, logo, ao clicar sim nada será alterado na lesão
+            </p>
+
+            <p *ngIf="numImgSalvas !== 0">
+                Você cropou e salvou <strong> {{ numImgSalvas }} </strong> imagem(ns), ao clicar sim a imagem original será
+                removida do banco de dados e do servidor e não poderá ser mais editada
+            </p>            
+
+            <div class="row float-right" >
+                <button
+                    type="button"
+                    class="btn btn-success"
+                    (click)="finalizarCrop(modalFinalizar)"
+                >
+                    Sim
+                    <i class="fa fa-check"></i>
+                </button>
+
+                <button
+                    style="margin-left: 15px;"
+                    type="button"
+                    class="btn btn-danger"
+                    (click)="modalFinalizar.hide()"
+                >
+                    Não
+                    <i class="fa fa-close"></i>
+                </button>
+            </div>
+            
+        </div>
+
+        </div>
+    </div>
+</div>
+<!-- MODAL FINALIZAR O CROP -->
+

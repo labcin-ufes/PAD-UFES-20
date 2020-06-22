@@ -1,0 +1,222 @@
+<div class="animated fadeIn">
+    <div class="row">
+        <div class="col-lg-12">
+
+            <!-- CASO A REQUISIÇÃO FALHE -->
+            <div class="card .mx-auto" *ngIf="flagFalha">
+                <div class="card-header">
+                    <h4> Falha de comunicação </h4>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-danger text-center" role="alert">                        
+                        <p>Infelizmente ocorreu uma falha de comunicação no sistema. Tente acessar novamente ou mais tarde. Caso persista, entre em contato com os desenvolvedores</p>                                                
+                    </div>
+                </div>
+            </div>
+            <!-- CASO A REQUISIÇÃO FALHE -->
+            
+            <div class="card" *ngIf="!flagFalha">
+                <div class="card-header">
+                    <i class="fa fa-th-list"></i>  
+                    <span class="tituloTabela"> Lista de usuários cadastrados no sistema </span>
+                </div>
+
+                <div class="card-body">
+                    <div  class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col">Nome</th>
+                                <th scope="col">Nome de usuário</th>
+                                <th scope="col">E-mail</th>
+                                <th scope="col">Nível de acesso</th>
+                                <th scope="col">Acesso liberado?</th>
+                                <th scope="col">Ação</th>                                
+                            </tr>
+                        </thead>
+
+                        <tbody *ngFor=" let usuario of usuarios">
+                            <tr scope="row">
+                                <td>{{ usuario.nomeCompleto }}</td>
+                                <td>{{ usuario.nomeUsuario }}</td>
+                                <td>{{ usuario.email }}</td>
+                                <td> 
+                                    <span *ngIf="usuario.papel === 'ADMIN'" class="badge badge-info">ADMIN</span>
+                                    <span *ngIf="usuario.papel === 'USER'" class="badge badge-secondary">USER</span>
+                                    <span *ngIf="usuario.papel === 'SUPER'" class="badge badge-dark">SUPER</span>
+                                </td>
+                                <td>
+                                    <span *ngIf="usuario.apto" class="badge badge-success">Sim</span>
+                                    <span *ngIf="!usuario.apto" class="badge badge-danger">Não</span>
+                                </td>
+                                <td>
+                                    <div class="text-left">
+
+                                        <!-- EDICAO DE USUARIO -->
+                                        <div 
+                                            class="btn-group" 
+                                            dropdown 
+                                            [autoClose]="true" 
+                                            [insideClick]="true"
+                                            [isDisabled]="usuario.papel === 'SUPER'">
+                                            
+                                            <button 
+                                                id="button-basic" 
+                                                dropdownToggle 
+                                                type="button" 
+                                                class="btn btn-info dropdown-toggle"
+                                                aria-controls="dropdown-basic"
+                                            >
+
+                                                <i class="fa fa-pencil"></i>
+                                            </button>
+                
+                                            <div id="dropdown-basic" *dropdownMenu class="dropdown-menu"
+                                                role="menu" aria-labelledby="button-basic">
+
+                                                <!-- FORMULARIO PARA EDICAO DE ADMIN E ACESSO DO USUARIO -->
+                                                <form class="px-4 py-3">
+                                                   
+                                                    <div class="form-group">
+
+                                                        <!-- SWITCH PARA LIBERAR O ACESSO -->
+                                                        <small *ngIf="respAlteracao === 'apto-salvo'" class="form-text text-success"> Usuário atualizado </small>
+                                                        <small *ngIf="respAlteracao === 'apto-falha'" class="form-text text-danger"> Falha na alteração </small>
+                                                        <label for="apto">Acesso liberado?</label>                                                        
+                                                        <label id="apto" class="switch switch-label switch-primary">
+                                                            
+                                                            <input 
+                                                                type="checkbox" 
+                                                                class="switch-input" 
+                                                                [checked]="usuario.apto"
+                                                                (click)="trocarAcessoUsuario(usuario)"                                                                
+                                                            >
+                                                            <span 
+                                                                class="switch-slider" 
+                                                                data-checked="Sim" 
+                                                                data-unchecked="Não">
+                                                            </span>
+                                                        </label>
+                                                        <!-- SWITCH PARA LIBERAR O ACESSO -->
+                                                    
+                                                        <!-- SWITCH PARA ALTERAR PAPEL -->
+                                                        <small *ngIf="respAlteracao === 'papel-salvo'" class="form-text text-success"> Usuário atualizado </small>
+                                                        <small *ngIf="respAlteracao === 'papel-falha'" class="form-text text-danger"> Falha na alteração </small>
+                                                        <label for="papel">Administrador?</label>
+                                                        <label id="papel" class="switch switch-label switch-primary">
+
+                                                            <input 
+                                                                type="checkbox" 
+                                                                class="switch-input" 
+                                                                [checked]="usuario.papel !== 'USER'"
+                                                                (click)="trocarNivelAcessoUsuario(usuario)"
+                                                            >
+                                                            <span 
+                                                                class="switch-slider" 
+                                                                data-checked="Sim" 
+                                                                data-unchecked="Não">
+                                                            </span>
+                                                        </label>
+                                                        <!-- SWITCH PARA LIBERAR O ACESSO -->
+
+                                                    </div>
+                                                    
+                                                </form>
+                                                <!-- FORMULARIO PARA EDICAO DE ADMIN E ACESSO DO USUARIO -->
+                                                
+                
+                                            </div>
+                                          </div>
+                                          <!-- EDICAO DE USUARIO -->
+
+
+                                        <!-- EXCLUSÃO DE USUARIO -->
+                                        <div 
+                                            class="btn-group" 
+                                            dropdown 
+                                            placement="bottom left"
+                                            #dropdown="bs-dropdown"
+                                            [autoClose]="true" 
+                                            [insideClick]="true"
+                                            [isDisabled]="usuario.papel === 'SUPER'">
+
+                                            <button 
+                                                id="button-basic" 
+                                                dropdownToggle 
+                                                type="button" 
+                                                class="btn btn-danger dropdown-toggle"
+                                                aria-controls="dropdown-basic"
+                                            >
+
+                                                <i class="fa fa-trash"></i>
+                                            </button>
+
+                                            <div id="dropdown-basic" *dropdownMenu class="dropdown-menu dropdown-menu-left"
+                                                role="menu" aria-labelledby="button-basic">
+
+                                                <!-- FORMULARIO PARA EDICAO DE ADMIN E ACESSO DO USUARIO -->
+                                                <div class="px-4 py-3">
+                                                
+                                                    <div class="form-group">
+
+                                                        <small *ngIf="respAlteracao === 'usuario-apagado'" class="form-text text-success"> Usuário atualizado </small>
+                                                        <small *ngIf="respAlteracao === 'falha-apagar'" class="form-text text-danger"> Falha na alteração </small>
+                                                        
+                                                        <label for="apagar">Tem certeza que deseja excluir {{ usuario.nome }}?</label>
+                                                        <button 
+                                                            type="button" 
+                                                            id="apagar"
+                                                            class="btn btn-success"
+                                                            (click)="excluirUsuario(usuario)"
+                                                        >
+                                                            Sim
+                                                        </button>
+
+                                                        <button 
+                                                            type="button" 
+                                                            id="apagar"
+                                                            class="btn btn-danger"
+                                                            (click)="dropdown.hide()"
+                                                        >
+                                                            Não
+                                                        </button>
+                                                    </div>
+                                                    
+                                                </div>
+                                                <!-- FORMULARIO PARA EXCLUSÃO DO USUARIO -->
+                                            </div>
+                                        </div>
+                                        <!-- BOTAO EXCLUIR USUARIO -->
+
+                                    </div>
+                                </td>
+
+                            </tr>                           
+                        </tbody>
+                    </table>
+                </div>
+               
+                    
+                <!-- PAGINAÇÃO -->
+                <div class="card-body d-flex justify-content-center">                 
+                    <pagination 
+                        [totalItems]="totalItens"
+                        [maxSize]="maxPagLinks"
+                        [(ngModel)]="paginaAtual"
+                        (pageChanged)="mudaPagina($event)"
+                        [itemsPerPage]="itensPorPag"
+                        previousText="Anterior"
+                        nextText="Próxima"
+                    >
+                    </pagination>
+                </div>
+                <div class="alert alert-secondary text-center" role="alert" style="margin-top: -20px;">
+                    <strong> Pagina {{ this.paginaAtual }} de {{ this.totalPaginas }} </strong>
+                </div>
+                <!-- PAGINAÇÃO -->
+                
+            </div>
+           
+        </div>
+    </div>
+</div>

@@ -1,0 +1,105 @@
+<div class="animated fadeIn">
+    <div class="row">
+        <div class="col-lg-12">
+
+            <div class="card">
+                <div class="card-header">
+                    <i class="fa fa-scissors"></i>     
+                    <strong> Segmentar imagens </strong>
+                </div>
+
+                <div class="card-body">
+                    
+                    <!-- MENSAGEM: AGUARDANDO -->
+                    <div    
+                        *ngIf="respUsuario === 'salvar-mascara-aguarde'"
+                        class="alert alert-info text-center"
+                        role="alert">
+                        <p> 
+                            Salvando imagem. Por favor, aguarde.
+                        </p>
+                    </div>
+
+                    <!-- MENSAGEM: SUCESSO -->
+                    <div    
+                        *ngIf="respUsuario === 'salvar-mascara-ok'"
+                        class="alert alert-success text-center"
+                        role="alert">
+                        <p> 
+                            Máscara salva com sucesso!
+                        </p>
+                    </div>
+
+                    <!-- MENSAGEM: ERRO -->
+                    <div    
+                        *ngIf="respUsuario === 'salvar-mascara-erro'"
+                        class="alert alert-danger text-center"
+                        role="alert">
+                        <p> 
+                            Houve um problema ao salvar a máscara da lesão. Por favor, tente mais tarde.
+                            Caso o erro persista, entre em contato com os desenvolvedores.
+                        </p>
+                    </div>
+
+                    <!-- MENU -->
+                    <div class="row">
+                        <div class="col col-sm-12">
+        
+                            <button 
+                                type="button"
+                                class="btn btn-info"
+                                (click)="cancelarSegmentacao()">
+                                    <i class="fa fa-arrow-left"></i>
+                                    Voltar
+                            </button>
+        
+                            <button 
+                                type="button"
+                                class="btn btn-success"
+                                style="margin-left: 5px;"
+                                (click)="salvarMascara()">
+                                    Salvar
+                                    <i class="fa fa-save"></i>
+                            </button>
+
+                            <div class="card-header-actions">
+                                <button type="button"
+                                        class="btn btn-dark"
+                                        style="margin-left: 5px;">
+                                    Mão livre <i class="fa fa-pencil"></i>
+                                </button>
+                                <button type="button"
+                                        class="btn btn-light"
+                                        style="margin-left: 5px;">
+                                    Polígono <i class="fa fa-pencil-square-o"></i>
+                                </button>
+                            </div>
+        
+                        </div>
+                    </div>
+
+                    <!-- CANVAS -->
+                    <div class="row">
+                        <div class="col-lg-6">                            
+                            <div style="margin: 15px 0;">
+                                <h5>Imagem original</h5>
+                            </div>
+                            <!-- CANVAS DE SEGMENTAÇÃO -->
+                            <canvas id="img_seg" [style.background-image]="'url(' + imagemUrl + ')'" class="canvas_seg"></canvas>
+                        </div>
+
+                        <div class="col-lg-6">
+                            <div style="margin: 15px 0;">
+                                <h5>Máscara</h5>
+                            </div>
+                            <!-- CANVAS COM A MÁSCARA RESULTANTE -->
+                            <canvas id="img_res"></canvas>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</div>

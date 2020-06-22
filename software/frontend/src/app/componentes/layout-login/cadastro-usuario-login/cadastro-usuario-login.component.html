@@ -1,0 +1,201 @@
+<div class="app-body vert-center">
+    <main class="main d-flex align-items-center">
+      <div class="container">      
+        <div class="row">          
+          <div class="col-md-6 mx-auto">
+            <div class="card mx-4">
+              <div class="card-body p-4">
+
+                <button 
+                    type="button"
+                    class="btn btn-link voltar"
+                    routerLink="/login">
+                    <i class="fa fa-arrow-left"></i>
+                    Voltar                    
+                  </button>
+
+                <form
+                  #dadosCadastroForm="ngForm"
+                  (ngSubmit)="recebeCadastroForm()"
+                  novalidate
+                >
+                  <h1>Cadastro de novo usuário</h1>
+                  <p class="text-muted">Crie sua conta para acessar o sistema</p>
+
+                  <!-- INFORMACAO CASO O CADASTRO FALHE -->
+                  <div *ngIf="flagRespostaCadastro !== 'false'">
+                    <div *ngIf="flagRespostaCadastro === 'problema-banco'" class="alert alert-danger text-center" role="alert">
+                      Houve um problema na comunicação com o banco de dados. Tente mais tarde ou entre em contado com os desenvolvedores.
+                    </div>
+
+                    <div *ngIf="flagRespostaCadastro === 'nao-permitido'" class="alert alert-warning text-center" role="alert">
+                      O nome de usuário ou email já está cadastrado no banco. Troque os valores e tente novamente.
+                    </div>
+
+                    <div *ngIf="flagRespostaCadastro === 'cadastrado'" class="alert alert-success text-center" role="alert">
+                      Olá <strong> {{ usuario.nomeCompleto }} </strong>! Seu cadastro foi realizado com sucesso. Seu nome de usuário é
+                       <strong> {{ usuario.nomeUsuario }}</strong>. Agora aguarde um usuário administrador liberar seu acesso no sistema.
+                    </div>
+                  </div>
+
+                  <!-- INFORMACAO CASO O CADASTRO FALHE -->
+
+                  <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text"><i class="icon-user"></i></span>
+                    </div>
+
+                    <!-- INPUT NOME COMPLETO -->
+                    <input 
+                      type="text"                
+                      class="form-control"       
+                      placeholder="Nome completo"                       
+                      name="nomeCompleto"
+                      ngModel                      
+                      minlength="3"
+                      required>
+                    <!-- INPUT NOME COMPLETO -->                    
+
+                  </div>
+
+                  <div class="form-group md-2">
+                    <div class="input-group mb-3">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text"><i class="icon-user"></i></span>
+                      </div>
+
+                      <!-- INPUT NOME USUARIO -->
+                      <input 
+                        type="text" 
+                        class="form-control" 
+                        placeholder="Nome de usuario"                       
+                        name="nomeUsuario"
+                        ngModel
+                        #nomeUsuarioInput="ngModel"
+                        minlength=3
+                        maxlenght=20
+                        required>
+                      <!-- INPUT NOME USUARIO -->
+
+                    </div>
+                    <small *ngIf="nomeUsuarioInput.invalid && nomeUsuarioInput.touched" class="form-text text-danger">O nome de usuário deve ter no mínimo 3 caracteres</small>
+                  </div>
+
+                  <div class="form-group md-2">
+                    <div class="input-group mb-3">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text">@</span>
+                      </div>
+
+                      <!-- INPUT EMAIL -->
+                      <input 
+                        type="email" 
+                        class="form-control" 
+                        placeholder="Email"                        
+                        name="email"
+                        ngModel
+                        email
+                        #emailInput="ngModel"
+                        required>
+                      <!-- INPUT EMAIL -->
+                      
+                    </div>
+                    <small *ngIf="emailInput.invalid && emailInput.touched" class="form-text text-danger">Digite um email válido</small>
+                  </div>
+                  <div class="form-group md-2">
+                    <div class="input-group mb-3">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text"><i class="icon-lock"></i></span>
+                      </div>
+
+                      <!-- INPUT SENHA -->
+                      <input 
+                        type="password" 
+                        class="form-control" 
+                        placeholder="Senha"                       
+                        name="senha"
+                        minlength=6
+                        ngModel
+                        #senhaInput="ngModel"
+                        (input)="checaSenhasIguais()"
+                        required>
+                      <!-- INPUT SENHA -->                    
+                    </div>
+                    <small *ngIf="senhaInput.invalid && senhaInput.touched" class="form-text text-danger">A senha deve conter no mínimo 6 dígitos</small>
+                  </div> 
+
+                  <div class="form-group md-3">
+                    <div class="input-group mb-4">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text"><i class="icon-lock"></i></span>
+                      </div>
+
+                      <!-- INPUT SENHA REPETIDA -->
+                      <input 
+                        type="password" 
+                        class="form-control" 
+                        placeholder="Repita a senha" 
+                        name="senhaRepetida"
+                        minlength=6
+                        ngModel
+                        required
+                        (input)="checaSenhasIguais()"                      
+                        >
+                      <!-- INPUT SENHA REPETIDA -->                    
+                    </div>
+                    <small *ngIf="flagSenhaIncompativel" class="form-text text-danger">As duas senhas devem ser iguais</small>
+                  </div> 
+
+                  <div class="form-group col-md">
+                    <div class="form-group">
+                     <div class="input-group">
+                      
+                        <!-- INPUT TERMO DE USO -->
+                      
+                          <input type="checkbox" id ="termoDeUso" class="form-check-input" name="termoDeUso" ngModel #termoDeUso="ngModel" required> 
+                          <label class="labelTermos" for="termoDeUso">Eu aceito os <a [routerLink]="['/termos-de-uso']" target="_blank">Termos de Uso</a></label>
+                       
+                       
+                        <!-- INPUT TERMO DE USO -->
+
+                      </div>
+                      <small *ngIf="termoDeUso.invalid && termoDeUso.touched" class="form-text text-danger">Para realizar o cadastro você deve concordar com os termos de uso</small>
+                    </div>
+                  </div>
+
+                  <!-- BOTAO DE SUBMISSAO -->
+                  <button 
+                    type="submit" 
+                    class="btn btn-block btn-success"
+                    [disabled]="dadosCadastroForm.invalid || flagSenhaIncompativel">                    
+                      Cadastrar
+                  </button>
+                  <!-- BOTAO DE SUBMISSAO -->
+
+                </form>
+
+
+              </div>              
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- MODAL ENVIANDO -->
+<div bsModal #modalCadastrando="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+    
+        <div class="modal-body text-center">
+
+            <h4> Você está sendo cadastrado. Por favor, aguarde! </h4>
+
+            <i class="fa fa-spinner fa-3x fa-spin" style="color: #1e66bd;"></i>
+
+        </div>
+    </div>
+    </div>
+</div>
+<!-- MODAL ENVIANDO -->

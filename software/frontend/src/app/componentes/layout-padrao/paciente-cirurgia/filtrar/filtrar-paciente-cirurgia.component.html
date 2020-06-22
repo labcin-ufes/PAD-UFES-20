@@ -1,0 +1,484 @@
+<div class="animated fadeIn">
+    <div class="row">
+        <div class="col-lg-12">
+
+        <!-- CASO A REQUISIÇÃO FALHE -->
+        <div class="card .mx-auto" *ngIf="flagFalha">
+            <div class="card-header">
+                <h4> Falha de comunicação </h4>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-danger text-center" role="alert">                        
+                    <p>Infelizmente ocorreu uma falha de comunicação no sistema. Tente acessar novamente ou mais tarde. Caso persista, entre em contato com os desenvolvedores</p>                                                
+                </div>
+            </div>
+        </div>
+        <!-- CASO A REQUISIÇÃO FALHE -->
+
+        <div class="card" *ngIf="!flagFalha">
+            <div class="card-header">
+                <i class="fa fa-filter"></i> 
+                <span class="tituloTabela"> Filtrar pacientes da cirurgia </span>
+
+                <!-- POPOVER DE AJUDA -->
+                <ng-template #popoverFiltro>
+                    <p>
+                        Selecione um ou mais campos do filtro para encontrar um ou um grupo de pacientes de acordo com
+                        a sua busca. Caso não preencha nenhum campo, todos os pacientes serão exibidos.
+                    <p>
+
+                    <hr>
+
+                    <p>
+                        É importante destacar que o <b> Local de atendimento </b> e as <b> Datas inciais e finais </b> são relativas a <b> Lesão </b>.
+                        Portanto, imagine a seguinte situação hipotética: um paciente possui 3 lesões que foram extraídas nos locais A, B e C. Ao filtrar
+                        pela cidade A, esse paciente será retornado pois pelo menos uma de suas lesões foi extraída no local. O mesmo vale para a data de 
+                        atendimento.
+                    </p>
+                </ng-template>
+
+                <button 
+                type="button" 
+                class="btn btn-info btn-sm" 
+                placement="bottom-left" 
+                [ngbPopover]="popoverFiltro"
+                popoverTitle="Como utilizar o filtro"  
+                style="z-index: 999;"                  
+                >
+                    <i class="fa fa-question"></i>
+                </button>
+                <!-- POPOVER DE AJUDA  -->                    
+            
+            </div>
+
+
+            <div class="card-body">
+
+                <!-- FORMULARIO DE FITRO -->
+                <form
+                    #dadosForm="ngForm" 
+                    (ngSubmit)="recebeDadosForm()"
+                >
+
+                    <!-- PRIMEIRA LINHA DO FORM FILTRO -->
+                    <div class="row">
+
+                        <!-- FILTRO POR NOME COMPLETO -->
+                        <div class="form-group col-sm-4">
+                            <label for="nome">Nome do paciente: </label>
+                            <div>
+                                <input 
+                                    type="text" 
+                                    id="nome"
+                                    class="form-control"                                        
+                                    ngModel
+                                    name="nomePaciente"                                    
+                                >                                
+                            </div>
+                        </div>
+                        <!-- FILTRO POR NOME COMPLETO -->
+
+                        <!-- FILTRO LOCAL-->
+                        <div class="form-group col-sm-4">
+                            <label for="local">Local de atendimento:</label>
+                            <input 
+                                id="local" 
+                                type="text" 
+                                class="form-control" 
+                                [(ngModel)]="nomeLocalComp"
+                                name="localAtendimento" 
+                                [ngbTypeahead]="buscaNomeLocal"
+                            />
+                        </div>
+                        <!-- FILTRO LOCAL -->
+
+                        <!-- FILTRO DIAGNOSTICO CLINICO-->
+                        <div class="form-group col-sm-4">
+                            <label for="diagCli">Diagnóstico clínico: </label>
+                            <div>
+                                <input 
+                                    id="diagCli" 
+                                    type="text" 
+                                    class="form-control" 
+                                    [(ngModel)]="nomeDiagCliComp"
+                                    name="diagClinico" 
+                                    [ngbTypeahead]="buscaDiagnostico"
+                                />                             
+                            </div>                                
+                        </div>
+                        <!-- FILTRO DIAGNOSTICO CLINICO-->               
+                        
+                    </div>
+                    <!-- PRIMEIRA LINHA DO FORM FILTRO -->
+
+                    <!-- SEGUNDA LINHA DO FORM FILTRO -->
+                    <div class="row">
+
+                        <!-- FILTRO DATA INICIAL -->
+                        <div class="form-group col-sm-4">
+                            <label for="dataInicial">Data inicial: </label>
+                            <div>
+                                <input 
+                                    type="text"
+                                    class="form-control" 
+                                    name="dataInicial"
+                                    mask="00/00/0000"
+                                    [dropSpecialCharacters]="false"
+                                    placeholder="dd/mm/aaaa"
+                                    ngModel
+                                > 
+
+                            </div>
+                        </div>
+                        <!-- FILTRO DATA INICIAL -->
+
+                        <!-- FILTRO DATA FINAL -->
+                        <div class="form-group col-sm-4">
+                            <label for="dataFinal">Data final: </label>
+                            <div>                                    
+                                <input 
+                                    type="text"
+                                    class="form-control" 
+                                    name="dataFinal"
+                                    mask="00/00/0000"
+                                    [dropSpecialCharacters]="false"
+                                    placeholder="dd/mm/aaaa"
+                                    ngModel
+                                >                         
+                            </div>                                
+                        </div>
+                        <!-- FILTRO DATA FINAL -->
+
+                        <!-- FILTRO DIAGNOSTICO HISTO-->
+                        <div class="form-group col-sm-4">
+                            <label for="diagHisto">Diagnóstico histopatologico: </label>
+                            <div>
+                                <input 
+                                    id="diagHisto" 
+                                    type="text" 
+                                    class="form-control" 
+                                    [(ngModel)]="nomeDiagHistoComp"
+                                    name="diagHisto" 
+                                    [ngbTypeahead]="buscaDiagnostico"
+                                />                                
+                            </div>                                
+                        </div>
+                        <!-- FILTRO DIAGNOSTICO HISTO-->
+
+                    </div>                        
+                    <!-- SEGUNDA LINHA DO FORM FILTRO -->
+
+                    <!-- TERCEIRA LINHA DO FORM FILTRO -->
+                    <div class="row">
+
+                        <!-- FILTRO POR REGIAO DA LESAO -->
+                        <div class="form-group col-sm-4">
+                            <label for="regiao">Região da lesão: </label>
+                            <div>
+                                <input 
+                                    id="regiao" 
+                                    type="text" 
+                                    class="form-control" 
+                                    [(ngModel)]="nomeRegiaoComp"
+                                    name="regiao" 
+                                    [ngbTypeahead]="buscaRegiao"
+                                />                                
+                            </div>
+                        </div>
+                        <!-- FILTRO POR REGIAO DA LESAO -->
+                                                    
+                        <div class="form-group col-sm-4">
+
+                            <div class="row">
+                                <div class="col">
+                                    <p> Sem lesão? </p>
+                                </div>
+
+                                <div class="col">
+                                    <label class="switch switch-label switch-primary">
+                                        <input 
+                                            type="checkbox" 
+                                            class="switch-input"                                                 
+                                            ngModel
+                                            name="semLesao"
+                                        >
+                                        <span 
+                                            class="switch-slider" 
+                                            data-checked="Sim" 
+                                            data-unchecked="Não">
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>   
+
+                            <div class="row">
+                                <div class="col">
+                                    <p> Sem imagem? </p>
+                                </div>
+
+                                <div class="col">
+                                    <label class="switch switch-label switch-primary">
+
+                                        <input 
+                                            type="checkbox" 
+                                            class="switch-input"                                                 
+                                            ngModel
+                                            name="semImagem"
+                                        >
+                                        <span 
+                                            class="switch-slider" 
+                                            data-checked="Sim" 
+                                            data-unchecked="Não">
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>                                                                             
+                            
+                        </div>
+                        
+                        <div class="form-group col-sm-4">  
+                            <div class="row">
+                                <div class="col">
+                                    <p> No local do PAD? </p>
+                                </div>
+
+                                <div class="col">
+                                
+                                    <label class="switch switch-label switch-primary">
+
+                                        <input 
+                                            type="checkbox" 
+                                            class="switch-input"  
+                                            ngModel
+                                            name="padLocal"                                               
+                                        >
+                                        <span 
+                                            class="switch-slider" 
+                                            data-checked="Sim" 
+                                            data-unchecked="Não">
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>    
+                            
+                            <div class="row">
+                                <div class="col">
+                                    <p> Sem Histopatológico? </p>
+                                </div>
+
+                                <div class="col">
+                                
+                                    <label class="switch switch-label switch-primary">
+
+                                        <input 
+                                            type="checkbox" 
+                                            class="switch-input"  
+                                            ngModel
+                                            name="semHisto"                                               
+                                        >
+                                        <span 
+                                            class="switch-slider" 
+                                            data-checked="Sim" 
+                                            data-unchecked="Não">
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>                                 
+                        </div>
+
+                    </div>                        
+                    <!-- TERCEIRA LINHA DO FORM FILTRO -->   
+
+                    <div class="form-group float-right">
+
+                        <button
+                            type="submit"
+                            class="btn btn-success btn-lg"
+                            [disabled]="dadosForm.invalid"
+                        >
+                            Filtrar pacientes
+                            <i class="fa fa-filter"></i>
+                        </button>
+
+                    </div>
+
+                </form>
+                <!-- FORMULARIO DE FITRO -->
+
+            </div>
+        </div>
+
+        <!-- CARD COM RESUMO DAS INFORMAÇÕES -->
+        <div class="row" *ngIf="!flagFalha && exibirPainelPacientes">
+
+            <!-- NUMERO DE PACIENTES RETORNADOS -->
+            <div class="col-6 col-lg-4">
+                <div class="card">
+                    <div class="card-body p-0 clearfix">
+                        <i class="fa fa-users bg-primary p-3 font-2xl mr-3 float-left"></i>
+                        <div class="h5 text-primary mb-0 pt-2"> {{this.numPacientes}} </div>
+                        <div class="text-muted text-uppercase font-weight-bold font-xs">Pacientes</div>
+                    </div>
+                </div>
+            </div>
+            <!-- NUMERO DE PACIENTES RETORNADOS -->
+
+            <!-- NUMERO DE CIRURGIAS RETORNADOS -->
+            <div class="col-6 col-lg-4">
+                <div class="card">
+                    <div class="card-body p-0 clearfix">
+                        <i class="fa fa-medkit bg-success p-3 font-2xl mr-3 float-left"></i>
+                        <div class="h5 text-success mb-0 pt-2"> {{this.numCirurgias}} </div>
+                        <div class="text-muted text-uppercase font-weight-bold font-xs">Cirurgias</div>
+                    </div>
+                </div>
+            </div>
+            <!-- NUMERO DE CIRURGIAS RETORNADOS -->   
+
+            <!-- NUMERO DE IMAGENS RETORNADOS -->
+            <div class="col-6 col-lg-4">
+                <div class="card">
+                    <div class="card-body p-0 clearfix">
+                        <i class="fa fa-image bg-danger p-3 font-2xl mr-3 float-left"></i>
+                        <div class="h5 text-danger mb-0 pt-2"> {{this.numImagens}} </div>
+                        <div class="text-muted text-uppercase font-weight-bold font-xs">Imagens</div>
+                    </div>
+                </div>
+            </div>
+            <!-- NUMERO DE IMAGENS RETORNADOS -->                     
+
+        </div>
+        <!-- CARD COM RESUMO DAS INFORMAÇÕES -->
+
+        <div class="card" *ngIf="!flagFalha && exibirPainelPacientes">
+                <div class="card-header">
+                    <i class="fa fa-th-list"></i> 
+                    <span class="tituloTabela"> Lista dos pacientes filtrados </span>
+
+                    <div class="float-right">
+
+                        <!-- BOTÃO PARA EXPORTAR EM PDF -->
+                        <button
+                        title="Exportar em PDF"
+                        class="btn btn-danger"
+                        type="button"
+                        (click)="gerarPDF()"
+                        >    
+                            <i class="fa fa-file-pdf-o"></i>
+                        </button>
+                        <!-- BOTÃO PARA EXPORTAR EM PDF -->
+                    </div>
+
+                </div>
+
+                <div class="card-body">  
+
+                    
+                    <div class="table-responsive">
+                    <table class="table table-striped">                            
+                            <thead>
+                                <tr>
+                                    <th scope="col"> Cartão do SUS </th>
+                                    <th scope="col">Nome</th>
+                                    <th scope="col">Idade</th>
+                                    <th scope="col">Último atendimento</th>
+                                    <th scope="col">Local</th>                                    
+                                    <th scope="col">Nº de lesões</th>
+                                    <th scope="col">Ações</th>
+                                </tr>
+                            </thead>
+
+                            <tbody *ngFor=" let paciente of pacientesCirurgia">
+                                <tr scope="row">
+                                    <td>{{ paciente.cartaoSus }}</td>
+                                    <td>{{ paciente.nomeCompleto }}</td>
+                                    <td>{{ paciente.dataNascimento | idade }}</td>
+                                    <td>{{ paciente.dataUltimoAtendimento | dataStr}}</td>
+                                    <td>{{ paciente.localUltimoAtendimento }}</td>                                
+                                    <td>
+                                        <span *ngIf="paciente.lesoes.length <= 0" class="badge badge-danger">{{ paciente.lesoes.length }}</span>
+                                        <span *ngIf="paciente.lesoes.length > 0" class="badge badge-success">{{ paciente.lesoes.length }}</span>
+                                    </td>
+                                    <td>
+
+                                        <div class="row">
+                                            <div class="col-2" >
+                                                <a
+                                                style="background-color:#6eaa5e; border-color:#6eaa5e;"                                        
+                                                class="btn btn-primary"                                                
+                                                routerLink="/dashboard/paciente-cirurgia/visualizar-paciente/{{paciente.cartaoSus}}"  
+                                                target="_blank" 
+                                                title="Visualizar paciente"                                             
+                                                >
+                                                    <i class="fa fa-eye"></i>
+                                                </a>
+                                            </div>
+
+                                            <div class="col-2">
+                                                <a
+                                                class="btn btn-primary"
+                                                routerLink="/dashboard/paciente-cirurgia/nova-lesao/{{paciente.cartaoSus}}"
+                                                target="_blank"
+                                                title="Adicionar lesão"
+                                                >
+                                                    <i class="fa fa-medkit"></i>
+                                                </a>
+                                            </div>
+
+                                            <div class="col-2">
+                                                <a
+                                                class="btn btn-secondary"
+                                                routerLink="/dashboard/paciente-cirurgia/novo-histopatologico/{{paciente.cartaoSus}}"
+                                                target="_blank"
+                                                title="Cadastrar histopatológico"
+                                                >
+                                                    <i class="fa fa-file-text-o"></i>
+                                                </a>
+                                            </div>
+
+                                            <div class="col-2">
+                                                <a
+                                                class="btn btn-warning"
+                                                routerLink="/dashboard/paciente-cirurgia/editar-paciente/{{paciente.cartaoSus}}"
+                                                target="_blank"
+                                                title="Editar paciente"
+                                                >
+                                                    <i class="fa fa-pencil"></i>
+                                                </a>
+                                            </div>
+
+
+                                        </div>
+                                        
+                                            
+                                    </td>
+                                </tr>
+                            </tbody>
+                    </table>
+                    </div>
+
+                    <!-- PAGINAÇÃO -->
+                    <div class="card-body row d-flex justify-content-center">                 
+                        <pagination 
+                            [totalItems]="totalItens"
+                            [maxSize]="maxPagLinks"
+                            [(ngModel)]="paginaAtual"
+                            (pageChanged)="mudaPagina($event)"
+                            [itemsPerPage]="itensPorPag"
+                            previousText="Anterior"
+                            nextText="Próxima"
+                        >
+                        </pagination>                        
+                    </div>     
+                    <div class="alert alert-secondary text-center" role="alert" style="margin-top: -20px;">
+                        <strong> Pagina {{ this.paginaAtual }} de {{ this.totalPaginas }} </strong>
+                    </div>               
+                    <!-- PAGINAÇÃO -->
+                </div>
+        </div>
+
+                
+            
+        </div>
+    </div>
+</div>

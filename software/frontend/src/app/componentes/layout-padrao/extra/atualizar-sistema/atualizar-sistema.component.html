@@ -1,0 +1,169 @@
+<div class="animated fadeIn">
+
+    <div class="card" *ngIf="flagFalha">
+        <div class="card-header">
+            <i class="fa fa-flag"></i>
+            <strong> Falha de comunicação </strong>
+        </div>
+
+        <div class="card-body">
+
+            <div class="alert alert-danger text-center">
+                <strong>Ocorreu um problema na transmissão do arquivo. Cheque os logs para entender o problema. </strong>
+            </div>
+
+        </div>
+    </div>
+
+
+    <div class="card" *ngIf="!flagFalha">
+
+        <div class="card-header">
+            <i class="fa fa-upload"></i>
+            <strong> Atualizar sistema </strong>            
+        </div>
+
+        <div class="card-body">
+            
+            <div class="row">
+                <div class="col">
+                    <div class="alert alert-info" style="font-size: 15px;">
+                        <p>
+                            <strong> Para atualizar o sistema para uma nova versão, siga os seguintes passos: </strong>
+                        </p>
+
+                        <ul>
+                            <li>
+                                Gere a build do angular através do comando <span class="text-muted">ng build --base-href /sade/ --prod</span>
+                            </li>
+                            
+                            <li>
+                                Rode o servidor na sua máquina com o comando <span class="text-muted">mvn spring-boot:run</span>
+                            </li>
+
+                            <li>
+                                Se tudo ocorreu corretamente nos dois passos anteriores, gere o <span class="text-muted">.jar</span> da aplicação 
+                                através do comando <span class="text-muted">mvn package</span>
+                            </li>
+
+                            <li>
+                                Finalizado a geração do pacote, na pasta <span class="text-muted">server/target</span> você encontrará um arquivo <span class="text-muted">.jar</span>
+                                no formato <span class="text-muted">sade-x.y.z.jar</span>, sendo x, y, e z os números da versão gerada. Pegue este arquivo e faça o upload dele no formulárui abaixo.
+                            </li>
+
+                            <li> 
+                                Você pode escolher a URL do servidor que deseja atualizar. Caso queira atualizar o servidor no NPD, deixe tudo como está! 
+                            </li>
+
+                            <li>
+                                Aguarde o upload. Quando ele finalizar, o sistema será atualizado automaticamente.
+                            </li>                    
+                        </ul>
+
+                        <p> 
+                            <span class="badge badge-info"  style="font-size: 14px;">Info</span> Para mais informações, leia o <a href="https://github.com/paaatcha/SADE/tree/master/server" title="Necessário ser contribuidor no git para acessar esse link"> readme do server </a> no github e/ou o 
+                            tutorial no driver do sistema.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div *ngIf="enviando === 'nao-comecou'">
+                <div class="row" style="margin-top: 20px;">
+
+                        
+                    <div class="form-group col">
+                        <label for="jar" style="font-size: 14px; font-weight: bold;">Defina a URL do servidor a ser atualizado: </label>
+                        <div>
+                            <input 
+                                id="urlServer"
+                                type="text"
+                                class="form-control"                                             
+                                [(ngModel)]="urlServer" 
+                                >                             
+                        </div>
+                    </div>
+                        
+
+
+                    <div class="form-group col">
+                        <label for="jar" style="font-size: 16px; font-weight: bold;">Upload do arquivo .jar: </label>
+                        <div>
+                            <input 
+                                type="file" 
+                                #inputFile
+                                id="jar"
+                                class="form-control-file"             
+                                (change)="enviaJar($event)"                                            
+                            >                                
+                        </div>
+                        <small 
+                            *ngIf="jarInvalido && jarInvalido !== undefined" 
+                            class="form-text text-danger">
+                                Você está submentendo um arquivo que não é um .jar
+                        </small>
+                        <small 
+                            *ngIf="!jarInvalido && jarInvalido !== undefined" 
+                            class="form-text text-success">
+                                Arquivo encontrado com sucesso!
+                        </small>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="form-group col" style="margin-top: 15px;">
+                        <button
+                            type="button"
+                            class="btn btn-success"
+                            [disabled]="jarInvalido===undefined || jarInvalido"
+                            (click)="enviarJarBotao()"
+                        >
+                            Atualizar sistema 
+                            <i class="fa fa-refresh"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div *ngIf="enviando !== 'nao-comecou'">
+
+                <div class="row" *ngIf="enviando !== '100%'">
+                    <div class="col text-center">
+                        <h5> Enviando o arquivo. Por favor, aguarde. </h5>
+                    </div>
+                </div>
+
+                <div class="row" *ngIf="enviando === '100%'">
+                    <div class="col text-center">
+                        <h4 style="color: #09723d;"> O .jar foi enviado com sucesso. Aguarde alguns segundos para o sistema atualizar. </h4>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col">
+                        <div class="progress" style="height: 35px; font-weight: bold; font-size: 14px;">                
+                            <div 
+                                class="progress-bar"
+                                role="progressbar"
+                                [ngStyle]="{'width': enviando}"                    
+                                aria-valuemin="0" aria-valuemax="100">
+                                
+                                {{enviando}}
+                            
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            
+
+            
+
+        </div>
+
+
+    </div>
+
+
+</div>

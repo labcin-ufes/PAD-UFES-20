@@ -1,0 +1,9 @@
+// Modifica scss da navbar do bootstrap
+.sidebar {
+    .nav-dropdown.open {
+        background: #20A8D8; // modificado
+        .nav-dropdown-items {
+            background: #262a2e; // modificado
+        }
+    }
+}

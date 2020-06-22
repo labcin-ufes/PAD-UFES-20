@@ -1,0 +1,89 @@
+<div class="animated fadeIn">
+
+  <div class="row">
+
+    <div class="col">
+
+      <div class="card">
+
+        <div class="card-header">
+          <strong> Cadastrar paciente </strong>
+          <i class="fa fa fa-user-plus"></i>
+        </div>
+
+        <div class="card-body">
+
+          <div class="alert alert-success text-center col-12" role="alert" *ngIf="respReq === 'pac-cadastrado'">
+              O Paciente com cartão do sus <strong>{{ cartaoSus }}</strong> foi cadastrado com sucesso. 
+              <br/>
+              <button
+                style="font-weight: bold;"
+                type="button"
+                class="btn btn-outline-success"
+                routerLink="/dashboard/dermato/nova-lesao/{{cartaoSus}}"
+              >
+                Cadastrar lesões
+              </button>
+          </div>
+
+          <div class="alert alert-warning text-center" role="alert" *ngIf="respReq === 'pac-existe'">
+              O Paciente com cartão do sus <strong>{{ cartaoSus }}</strong> já existe no banco de dados
+          </div>
+
+          <div class="alert alert-danger text-center" role="alert" *ngIf="respReq === 'falha-req'">
+              Ocorreu uma falha no cadastro do paciente. Tente mais tarde, caso o erro persista, entre em contato com os desenvolvedores
+          </div>          
+
+
+          <div class="row">
+
+              <!-- CARTAO DO SUS -->
+              <div class="form-group col-sm-4">
+                  <label for="diagCli">Cartão do SUS*: </label>
+                  <div>
+                      <input 
+                        id="cartaoSus"
+                        type="text"
+                        class="form-control" 
+                        [dropSpecialCharacters]="false"
+                        [(ngModel)]="cartaoSus" 
+                        mask="000-0000-0000-0000" 
+                        placeholder="000-0000-0000-0000"
+                        (keyup)="validaCartaoSus()"
+                        (click)="resetaRespPac()"
+                      > 
+                  </div>
+              </div>
+              <!-- CARTAO DO SUS -->
+
+          </div>
+
+          <div class="row">
+
+              <!-- BOTAO CADASTRAR -->
+              <div class="form-group col-sm-4">
+                  <button
+                    type="button"
+                    class="btn btn-success"
+                    (click)="cadastraPac()"
+                    [disabled]="!cartaoSusValido"
+                  >
+                    Cadastrar
+                    <i class="fa fa-check"></i>
+                  </button>
+
+              </div>
+              <!-- BOTAO CADASTRAR -->
+
+          </div>          
+
+        </div>
+        
+      </div>
+
+    </div>
+
+  </div>
+
+
+</div>

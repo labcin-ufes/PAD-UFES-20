@@ -1,0 +1,17 @@
+input.ng-invalid.ng-touched {
+    border: 1px solid red;
+}
+
+input.ng-valid.ng-touched {
+    border-color: #4dbd74;  
+}
+
+.voltar {
+    margin-bottom: 5px;
+    margin-left: -12px;
+}
+
+.labelTermos {
+    padding-top: 6px;
+    padding-left: 5px;
+}

@@ -1,0 +1,10 @@
+.tituloTabela {
+    font-weight: bold;
+    font-size: 15px;
+}
+
+#pag-center{    
+    float: none;
+    margin: 0 auto;    
+}
+

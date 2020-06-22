@@ -1,0 +1,339 @@
+
+<div class="animated fadeIn">
+
+        <!-- CARD PARA CASO DE FALHA NA REQUISICAO  -->
+        <div class="row" *ngIf="flagFalhaReqURL">
+            <div class="col-lg-12">
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h4> Falha de comunicação <i class="fa fa-exclamation-triangle"></i> </h4>                        
+                    </div>
+
+                    <div class="card-body">
+                        <div class="alert alert-danger text-center" role="alert">
+                            Infelizmente ocorreu uma falha de comunicação. Tente acessar mais tarde. Caso persista, entre em contato
+                            com os desenvolvedores.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- CARD PARA CASO DE FALHA NA REQUISICAO  -->
+
+        <!-- BUSCAR CARTÃO SUS CASO NAO VENHA COMO PARAMETRO --> 
+        <div class="row" *ngIf="cartaoSusURL === undefined && !flagFalhaReqURL && cartaoSusURL !== 'invalido'">
+            <div class="col-lg-12">
+                
+                <!-- BUSCAR CARTÃO SUS CASO NAO VENHA COMO PARAMETRO -->
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fa fa-search"></i>
+                        <span class="tituloTabela"> Buscar Paciente </span>                                                
+                    </div>
+
+                    <div class="card-body">
+
+                        <!-- AVISO PARA CASO NAO ENCONTRE O PACIENTE -->
+                        <div class="alert alert-warning text-center" role="alert" *ngIf="pacienteNaoEncontrado">                        
+                            <p> O paciente com cartão do sus <strong> {{ cartaoSusForm }} </strong> não está cadastrado no sistema! </p>                                                
+                        </div>
+                        <!-- AVISO PARA CASO NAO ENCONTRE O PACIENTE -->
+
+                        <form #susForm="ngForm" (ngSubmit)="changeRoute(cartaoSus.value)">
+                        <!-- INICIO DA BUSCA DO PACIENTE -->
+                        <div class="row">
+                            <div class="form-group col-8">
+                                <label for="cartaoSus">Digite o número do cartão do SUS:</label>
+
+                                <input 
+                                    id="cartaoSus"
+                                    type="text"
+                                    class="form-control invalid" 
+                                    [dropSpecialCharacters]="false"
+                                    [(ngModel)]="cartaoSusForm" 
+                                    name="cartaoSus"
+                                    #cartaoSus="ngModel"
+                                    mask="000-0000-0000-0000" 
+                                    placeholder="000-0000-0000-0000"
+                                    (click)="resetaAlert()"
+                                    required
+                                    minlength=18
+                                >                                
+                            </div>                            
+                        </div> 
+                        <button type="submit" class="btn btn-success" [disabled]="!susForm.valid">
+                            Buscar
+                            <i class="fa fa-search"></i>
+                        </button>
+                        </form>
+
+                        <!-- <button 
+                            type="button"
+                            class="btn btn-success"
+                            (click)="buscarPacViaBotao()"
+                            [disabled]="!cartaoSusValido"
+                        >
+                            Buscar
+                            <i class="fa fa-search"></i>
+                        </button> -->
+                        <!-- INICIO DA BUSCA DO PACIENTE -->              
+
+                    </div>
+                </div>                
+            </div>
+        </div>        
+        <!-- BUSCAR CARTÃO SUS CASO NAO VENHA COMO PARAMETRO --> 
+
+        <!-- CARD PARA CARTAO DA URL INVALIDO  -->
+        <div class="row" *ngIf="cartaoSusURL==='invalido' && !flagFalhaReqURL">
+            <div class="col-lg-12">
+                
+                <div class="card">
+                    <div class="card-header">
+                         Falha de comunicação <i class="fa fa-exclamation-triangle"></i>
+                    </div>
+
+                    <div class="card-body">
+                        <div class="alert alert-danger text-center" role="alert">
+                            <p> O cartão do sus <strong> {{ cartaoURL }} </strong> informado na URL não é válido! </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- CARD PARA CARTAO DA URL INVALIDO  -->
+
+        <!-- CARD PARA CARTAO DA URL NAO ENCONTRADO  -->
+        <div 
+            class="row" 
+            *ngIf="cartaoSusURL!==undefined && !flagFalhaReqURL && cartaoSusURL !== 'invalido' && paciente===undefined"
+        >
+            <div class="col-lg-12">
+                
+                <div class="card">
+                    <div class="card-header">
+                            <span class="tituloTabela"> Dados do paciente  </span>
+                        <i class="fa fa-address-card-o"></i>
+                    </div>
+
+                    <div class="card-body">
+                        <div class="alert alert-warning text-center" role="alert">
+                                <p> O paciente com cartão do sus <strong> {{ cartaoSusURL }} </strong> não está cadastrado no sistema! </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- CARD PARA CARTAO DA NAO ENCONTRADO  --> 
+
+        <!-- EXIBINDO OS DADOS DO PACIENTE PARA CONFERÊNCIA DO USUARIO -->
+        <div class="row" *ngIf="paciente !== undefined && !editarLesoes">
+            <div class="col-lg-12">
+
+                <!-- CARD COM DETALHES DO PACIENTE SE ELE FOI ENCONTRADO -->
+                <div class="card" *ngIf="paciente !== undefined">
+                    <div class="card-header">
+                        <i class="fa fa-address-card-o"></i>
+                        <span class="tituloTabela"> Dados do paciente </span>
+                        <!-- POPOVER SOBRE O PACIENTE -->                         
+                        <button 
+                            class="btn btn-info btn-sm" 
+                            placement="right" 
+                            popover="Caso este não seja o paciente que você deseja inserir uma lesão, por favor, corrija o valor do cartão do sus ou busque por outro paciente" 
+                            type="button">
+                            <i class="fa fa-comment"></i>
+                        </button>                        
+                        <!-- POPOVER SOBRE O PACIENTE -->                 
+                    </div>
+
+                    <div class="card-body">                        
+                        <strong> Nome: </strong> {{paciente.nomeCompleto}} <br/>
+                        <strong> Data de Nascimento: </strong> {{ paciente.dataNascimento | dataStr }} <br/>
+                        <strong> Local do último atendimento: </strong> {{ paciente.localUltimoAtendimento }} <br/>
+                        <strong> Data do último atendimento: </strong> {{ paciente.dataUltimoAtendimento | dataStr }} <br/>
+                        <strong> Lesões cadastradas para o paciente: </strong> {{ paciente.lesoes.length }} <br/>
+                    </div>
+                    
+                    <div class="card-footer">
+                        <button *ngIf="editarInfos === false" class="btn btn-sm btn-primary" (click)="editarInfos = true">
+                            <i class="fa fa-pencil-square-o"></i> Editar</button>
+                        <button *ngIf="editarInfos === false" class="btn btn-sm btn-danger" style="margin-left: 5px;" (click)="modalExcluirPac.show()">
+                            <i class="fa fa-trash"></i> Excluir</button>
+                        <button *ngIf="editarInfos === true" class="btn btn-sm btn-danger" (click)="editarInfos = false">
+                            <i class="fa fa-pencil-square-o"></i> Cancelar edição</button>
+                    </div>
+
+                </div>
+                <!-- CARD COM DETALHES DO PACIENTE SE ELE FOI ENCONTRADO -->
+            </div>  
+        </div>
+        <!-- EXIBINDO OS DADOS DO PACIENTE PARA CONFERÊNCIA DO USUARIO -->
+        
+        <!-- EXIBINDO OS DADOS DO PACIENTE PARA CONFERÊNCIA DO USUARIO -->
+        <app-novo-paciente 
+            *ngIf="editarInfos"
+            [pacInput]=pacResp
+            (eventoPacAlterado)="pegaEventoPacAlterado($event)"
+            >
+        </app-novo-paciente>
+        <!-- EXIBINDO OS DADOS DO PACIENTE PARA CONFERÊNCIA DO USUARIO -->
+
+
+        <!--######################################################################################################################-->
+        <!--############################## AQUI COMEÇA A INCLUSÃO DA LESÃO DE FATO ###############################################-->
+        <!--######################################################################################################################-->
+
+        <div class="row" *ngIf="paciente != undefined && !flagFalhaReqURL && !editarInfos">
+            <div class="col-lg-12">
+                <div class="card" *ngIf="!flagFalha">
+                    <div class="card-header">
+                        <i class="fa fa-th-list"></i>
+                        <span class="tituloTabela"> Lesões cadastradas </span>
+                    </div>
+
+                    <div class="card-body">
+                        <div  class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Diagnóstico</th>
+                                    <th scope="col">Região</th>
+                                    <th scope="col">Histopatológico</th>
+                                    <th scope="col">Imagens</th>
+                                    <th scope="col">Edição</th>
+                                </tr>
+                            </thead>
+
+                            <tbody *ngFor=" let lesao of paciente.lesoes">
+                                <tr scope="row">
+                                    <td>{{ lesao.diagnosticoClinico }}</td>
+                                    <td>{{ lesao.regiao }}</td>
+                                    <td>{{ lesao.diagnosticoHisto }}</td>
+                                    <td>
+                                        <button 
+                                            class="btn btn-success" 
+                                            (click)="exibeModal(lesao)" 
+                                            type="button"
+                                            title="Visualizar imagem"
+                                        >
+                                            <i class="fa fa-image"></i>
+                                        </button>                                        
+                                    </td>
+                                    <td>
+                                        <button 
+                                            type="button" 
+                                            class="btn btn-info" 
+                                            (click)="editarLesao(lesao)"
+                                            title="Editar lesão"
+                                        >
+                                            <i class="fa fa-pencil"></i>                                                    
+                                        </button>                                        
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <button *ngIf="editarLesoes" class="btn btn-sm btn-danger" (click)="editarLesoes = false">
+                            <i class="fa fa-pencil-square-o"></i> Cancelar edição</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+
+
+        <div class="card" *ngIf="editarLesoes">
+            <div class="card-header">
+                <i class="fa fa-scissors"></i>
+                <strong> Auditando lesão </strong>
+            </div>
+            <div class="card-body">
+                <app-editar-lesao (eventoRespEdicao)="pegaEventoRespEdicao($event)" [lesao]="lesaoEditada" [sus]="paciente.cartaoSus" *ngIf="editarLesoes"></app-editar-lesao>
+            </div>
+        </div>
+        
+</div>
+
+<!-- MODAL LESOES -->
+<div bsModal #modalLesao="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title"> Imagens </h4>
+        <button type="button" class="close" (click)="modalLesao.hide()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div *ngIf="lesaoAtual !== null" class="modal-body">
+        <!-- CARROSSEL -->
+        <carousel *ngIf="lesaoAtual.imagens.length" [showIndicators]="false">
+            <slide *ngFor="let imagem of lesaoAtual.imagens">
+                <a href="{{url_api}}/api/imagem/baixar?nomeImg={{imagem.path}}&tipo=cirurgia">
+                    <img src="{{url_api}}/api/imagem/baixar?nomeImg={{imagem.path}}&tipo=cirurgia&largura=200&altura=200" alt="Lesão"
+                        class="card-img-top">
+                </a>
+            </slide>
+        </carousel>
+        <div *ngIf="!lesaoAtual.imagens.length" class="alert alert-warning text-center" role="alert">
+            A lesão selecionada não possui imagens.
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" (click)="modalLesao.hide()">
+          Fechar
+        </button>
+      </div>
+
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+<!-- MODAL LESOES -->
+
+
+<!-- MODAL EXCLUIR PACIENTE -->
+<div bsModal #modalExcluirPac="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-danger" role="document">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h4 class="modal-title"> Tem certeza que deseja excluir o paciente? </h4>
+                <button type="button" class="close" (click)="modalExcluirPac.hide()" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <p>Ao deletar o paciente, todas as lesões e imagens associadas a este também serão deletadas.</p>
+            </div>
+
+        <div class="modal-footer">
+                <button
+                    type="button"
+                    class="btn btn-success"
+                    (click)="excluirPaciente()"
+                >
+                    Sim
+                    <i class="fa fa-check"></i>
+                </button>
+
+                <button
+                    style="margin-left: 15px;"
+                    type="button"
+                    class="btn btn-danger"
+                    (click)="modalExcluirPac.hide()"
+                >
+                    Não
+                    <i class="fa fa-close"></i>
+                </button>
+            
+        </div>
+
+        </div>
+    </div>
+</div>
+<!-- MODAL EXCLUIR PACIENTE -->

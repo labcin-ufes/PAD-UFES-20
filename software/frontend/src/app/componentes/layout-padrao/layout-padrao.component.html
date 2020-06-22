@@ -1,0 +1,80 @@
+<app-header
+  [fixed]="true"
+  [navbarBrandFull]="{src: 'assets/img/brand/logo.svg', width: 89, height: 25, alt: 'SADE Logo'}"
+  [navbarBrandMinimized]="{src: 'assets/img/brand/sygnet.svg', width: 30, height: 30, alt: 'SADE Logo'}"
+  [sidebarToggler]="'lg'"
+  [asideMenuToggler]="false"
+  [mobileAsideMenuToggler]="false">
+
+  <ul class="nav navbar-nav d-md-down-none">
+    <li class="nav-item dropdown" dropdown placement="bottom right" style="margin-left: 10px; color: #1e66bd; font-weight: bold">
+      <div popover="O Software de Análise Dermatológica é um programa desenvolvido pelos colaboradores do laboratório
+            LABCIN da Universidade Federal do Espírito Santo (UFES) para apoiar o Programa de Apoio Dermatológico (PAD)
+            desenvolvido e realizado por alunos e professores do curso de medicina da UFES."
+            triggers="mouseenter:mouseleave"
+            placement="bottom">
+            Bem vindo ao Software de Análise Dermatológica!
+      </div>
+    </li>    
+  </ul>
+
+  <ul class="nav navbar-nav ml-auto">
+
+    <li class="nav-item px-3">      
+      <button 
+        type="button"
+        class="btn btn-link nav-link"
+        (click)="sair()">
+          Sair
+      </button>
+    </li>
+
+  </ul>
+
+</app-header>
+
+<div class="app-body" *ngIf="flagViagem">
+  <main class="main">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="card col-12">
+                <div class="card-body" >
+                    <div class="alert alert-danger text-center" role="alert">                        
+                      Uma viagem do PAD está em andamento. Por motivos de segurança o site está temporariamente indisponível. Caso precise acessá-lo, favor contactar a equipe de suporte.
+                    </div>
+                  </div>
+            </div>
+        </div>
+    </div>
+  </main>
+</div>
+
+
+<div class="app-body" *ngIf="!flagViagem" >
+
+  <!-- Menu Lateral -->
+  <app-sidebar [fixed]="true" [display]="'lg'">
+    <app-sidebar-nav [navItems]="navItems" [perfectScrollbar] [disabled]="sidebarMinimized"></app-sidebar-nav>
+    <app-sidebar-minimizer></app-sidebar-minimizer>
+  </app-sidebar>
+
+  <!-- Main content -->
+  <main class="main">
+
+    <!-- Breadcrumb -->
+    <ol class="breadcrumb">
+      <app-breadcrumb></app-breadcrumb>      
+    </ol>
+    <div class="container-fluid">
+
+      <!-- AQUI ENTRA TODAS AS FUNCIONALIDADES DO SISTEMA-->
+      <router-outlet></router-outlet>
+
+    </div> <!-- /.container-fluid -->
+  </main>
+
+</div>
+<app-footer>
+  <span><a href="https://labcin.ufes.br/sade">SADE - Software de Análise Dermatológica</a> &copy; 2018</span>
+  <span class="ml-auto">Desenvolvido com <a href="https://coreui.io/angular">CoreUI for Angular</a></span>
+</app-footer>

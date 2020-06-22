@@ -1,0 +1,155 @@
+
+            <div class="modal-header">
+                <h4 class="modal-title pull-left"><i class="fa fa-medkit"></i> Lesão</h4>
+                <button type="button" class="close pull-right" aria-label="Close" (click)="bsModalRef.hide()">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="card">
+
+                        <!-- CARROSSEL DE IMAGENS -->
+                        <carousel *ngIf="imagens?.length" [showIndicators]="false">
+                            <slide *ngFor="let imagem of imagens">
+                                    
+                                    <img 
+                                        src="{{url_api}}/api/imagem/baixar?nomeImg={{imagem.path}}&tipo=cirurgia&largura=200&altura=200"
+                                        alt="Lesão"
+                                        class="card-img-top"
+                                    >
+                                    
+                            
+                                
+                                    <div class="btn-group float-right btndrop" dropdown>
+                                        <button dropdownToggle type="button"
+                                            class="btn btn-block btn-ghost-light dropdown-toggle"
+                                            style="opacity:0.6" [ngClass]="!imagens?.length?'btn-ghost-dark':''">
+                                            <i class="icon-settings"><span class="caret"></span></i>
+                                        </button>
+                                        <ul *dropdownMenu class="dropdown-menu dropdown-menu-right" role="menu">
+                                            <li role="menuitem">
+                                                <a class="dropdown-item" 
+                                                (click)="bsModalRef.hide()" 
+                                                href="{{url_api}}/api/imagem/baixar?nomeImg={{imagem.path}}&tipo=cirurgia"
+                                                target="_blank"                        
+                                                >
+                                                    Download
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+
+                                </slide>                            
+                        </carousel> 
+                        <!-- CARROSSEL DE IMAGENS -->
+
+                        <div class="box alert-warning text-center" *ngIf="!imagens?.length">
+                            <p class="conteudo">Não existe imagens cadastradas para esta lesão.</p>
+                        </div>
+                        
+                        <!-- DADOS DA LESÃO -->
+                        <div class="card-footer card-estilo">
+
+                            <div class="row">
+                                <div class="col">
+                                    <h5> <strong> Dados clínicos: </strong> </h5>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                
+                                <div class="col-md-6">
+                                    <div class="campo"><small>Diag. Clínico:</small><span>&nbsp;{{ lesao?.diagnosticoClinico }}</span></div>
+                                    <div class="campo"><small>Diag. Clínico Sec:</small><span>&nbsp;{{ lesao?.diagnosticoClinicoSecundario | nullData: '' }}</span></div>
+                                    <div class="campo"><small>Cirurgião:</small><span>&nbsp;{{ lesao?.cirurgiao | nullData: 'NÃO INFORMADO'}}</span></div>
+                                    <div class="campo"><small>Diâmetro maior:</small><span>&nbsp;{{ lesao?.diametroMaior }}</span></div>
+                                    <div class="campo"><small>Diâmetro menor:</small><span>&nbsp;{{ lesao?.diametroMenor }}</span></div>
+                                </div>
+
+                                <div class="col-md-6">                                                                        
+                                    <div class="campo"><small>Região:</small><span>&nbsp;{{ lesao?.regiao }}</span></div>
+                                    <div class="campo"><small>Procedimento:</small><span>&nbsp;{{ lesao?.procedimento }}</span></div>
+                                    <div class="campo"><small>Data do Procedimento:</small><span>&nbsp;{{ lesao?.dataProcedimento | dataStr }}</span></div>
+                                    <div class="campo"><small>Local do Procedimento:</small><span>&nbsp;{{ lesao?.localProcedimento }}</span></div>
+                                    <div class="campo"><small>Observação:</small><span>&nbsp;{{ lesao?.obs | nullData: 'NENHUMA' }}</span></div>
+                                </div>
+
+                            </div>
+
+                            <div class="row" style="margin-top: 15px;">
+                                <div class="col">
+                                    <h5> <strong> Dados histopatológico: </strong> </h5>
+                                </div>
+                            </div>
+
+                            <div class="row" *ngIf="lesao.diagnosticoHisto === null || lesao.diagnosticoHisto === undefined || lesao.diagnosticoHisto === ''">
+                                
+                                <div class="col">
+                                    <div class="alert alert-warning text-center">
+                                        Histopatológico não preenchido para esta lesão
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row" *ngIf="lesao.diagnosticoHisto !== null && lesao.diagnosticoHisto !== undefined && lesao.diagnosticoHisto !== ''">
+                                
+                                <!--Diag histo simples-->
+                                <div class=col-md-12 *ngIf="!lesao.diagnosticoHisto.includes('MELANOMA') && !lesao.diagnosticoHisto.includes('CARCINOMA BASOCELULAR')
+                                    && !lesao.diagnosticoHisto.includes('CARCINOMA ESPINOCELULAR')">
+                                    <div class="campo"><small>Diagnóstico Histopatológico:</small><span>&nbsp;{{ lesao?.diagnosticoHisto }}</span></div>
+                                </div>
+
+                                <!--Diag histo carcinoma basocelular-->
+                                <div class="col-md-12" *ngIf="lesao.diagnosticoHisto.includes('CARCINOMA BASOCELULAR')">
+                                    <div class="campo"><small>Diagnóstico Histopatológico:</small><span>&nbsp;{{ lesao?.diagnosticoHisto }}</span></div>
+                                    <div class="campo"><small>Subtipo Histo:</small><span>&nbsp;{{ lesao?.subtipoHisto | nullData: 'SEM RESULTADOS' }}</span></div>
+                                    <div class="campo"><small>Clark:</small><span>&nbsp;{{ lesao?.clark | nullData: 'SEM RESULTADOS' }}</span></div>
+                                    <div class="campo"><small>Limite Resseção:</small><span>&nbsp;{{ lesao?.limiteRessecao | nullData: 'SEM RESULTADOS' }}</span></div>
+                                </div>
+
+                                <!--Diag histo carcinoma espinocelular-->
+                                <div class="col-md-12" *ngIf="lesao.diagnosticoHisto.includes('CARCINOMA ESPINOCELULAR')">
+                                    <div class="campo"><small>Diagnóstico Histopatológico:</small><span>&nbsp;{{ lesao?.diagnosticoHisto }}</span></div>
+                                    <div class="campo"><small>Subtipo Histo:</small><span>&nbsp;{{ lesao?.subtipoHisto | nullData: 'SEM RESULTADOS' }}</span></div>
+                                    <div class="campo"><small>Clark:</small><span>&nbsp;{{ lesao?.clark | nullData: 'SEM RESULTADOS' }}</span></div>
+                                    <div class="campo"><small>Limite Resseção:</small><span>&nbsp;{{ lesao?.limiteRessecao | nullData: 'SEM RESULTADOS' }}</span></div>
+                                    <div class="campo"><small>Infiltração Perineural:</small><span>&nbsp;{{ lesao?.infiltracaoPerineural | nullData: 'SEM RESULTADOS' }}</span></div>
+                                    <div class="campo"><small>Infiltração Angiolinfática:</small><span>&nbsp;{{ lesao?.infiltracaoAngiolinfatica | nullData: 'SEM RESULTADOS' }}</span></div>
+                                    <div class="campo"><small>Tamanho do Tumor (mm):</small><span>&nbsp;{{ lesao?.tamanhoTumorDimMaior | nullData: 'SEM RESULTADOS' }}</span></div>
+                                </div>
+
+
+                                <!--Diag histo melanoma-->
+                                <div class="col-md-12" *ngIf="lesao.diagnosticoHisto.includes('MELANOMA')">
+                                            <div class="campo"><small>Diagnóstico Histopatológico:</small><span>&nbsp;{{ lesao?.diagnosticoHisto }}</span></div>
+                                            <div class="campo"><small>Subtipo Histo:</small><span>&nbsp;{{ lesao?.subtipoHisto | nullData: 'SEM RESULTADOS' }}</span></div>
+                                            <div class="campo"><small>Clark:</small><span>&nbsp;{{ lesao?.clark | nullData: 'SEM RESULTADOS' }}</span></div>
+                                            <div class="campo"><small>Breslow:</small><span>&nbsp;{{ lesao?.breslow | nullData: 'SEM RESULTADOS' }}</span></div>
+                                            <div class="campo"><small>Índice Miótico:</small><span>&nbsp;{{ lesao?.indiceMiotico | nullData: 'SEM RESULTADOS' }}</span></div>
+                                            <div class="campo"><small>Diâmetro maior tumor:</small><span>&nbsp;{{ lesao?.tamanhoTumorDimMaior | nullData: 'SEM RESULTADOS' }}</span></div>
+                                            <div class="campo"><small>Diâmetro menor tumor:</small><span>&nbsp;{{ lesao?.tamanhoTumorDimMenor | nullData: 'SEM RESULTADOS' }}</span></div>
+                                            <div class="campo"><small>Infiltrado inflamatório Linfócito:</small><span>&nbsp;{{ lesao?.infiltradoLinfocito | nullData: 'SEM RESULTADOS' }}</span></div>
+                                            <div class="campo"><small>Margem Cirurgia Profunda:</small><span>&nbsp;{{ lesao?.margemCirurgiaProfunda | nullData: 'SEM RESULTADOS' }}</span></div>
+                                            <div class="campo" *ngIf="lesao.margemCirurgiaProfunda === 'LIVRE'"><small>Inf. Extra Margem Cirurgia Profunda:</small><span>&nbsp;{{ lesao?.margemProfundaLivre | nullData: 'SEM INFORMAÇÕES' }}</span></div>
+                                            <div class="campo"><small>Margem Cirurgia Lateral:</small><span>&nbsp;{{ lesao?.margemCirurgiaLateral | nullData: 'SEM RESULTADOS' }}</span></div>
+                                            <div class="campo" *ngIf="lesao.margemCirurgiaLateral === 'LIVRE'"><small>Inf. Extra Margem Cirurgia Lateral:</small><span>&nbsp;{{ lesao?.margemLateralLivre | nullData: 'SEM INFORMAÇÕES' }}</span></div>
+                                            <div class="campo"><small>Tipo Tumor:</small><span>&nbsp;{{ lesao?.tipoTumor | nullData: 'SEM RESULTADOS' }}</span></div>
+                                            <div class="campo"><small>Crescimento Radial:</small><span>&nbsp;{{ lesao?.crescimentoRadial | nullData: 'SEM RESULTADOS' }}</span></div>
+                                            <div class="campo"><small>Crescimento Vertical:</small><span>&nbsp;{{ lesao?.crescimentoVertical | nullData: 'SEM RESULTADOS' }}</span></div>
+                                            <div class="campo"><small>Ulceração:</small><span>&nbsp;{{ lesao?.ulceracao | nullData: 'SEM RESULTADOS' }}</span></div>
+                                            <div class="campo"><small>Evidência Regressão:</small><span>&nbsp;{{ lesao?.evidenciaRegressao | nullData: 'SEM RESULTADOS' }}</span></div>
+                                            <div class="campo"><small>Associação Nevo Melanocito:</small><span>&nbsp;{{ lesao?.associacaoNevoMelanocito | nullData: 'SEM RESULTADOS' }}</span></div>
+                                            <div class="campo"><small>Invasão Vascular:</small><span>&nbsp;{{ lesao?.invasaoVascular | nullData: 'SEM RESULTADOS' }}</span></div>
+                                            <div class="campo"><small>Menor Distância Margem Resseção Lateral:</small><span>&nbsp;{{ lesao?.menorDistMargemRessecaoLateral | nullData: 'SEM RESULTADOS' }}</span></div>
+                                            <div class="campo"><small>Lesão Satélite:</small><span>&nbsp;{{ lesao?.lesaoSatelite | nullData: 'SEM RESULTADOS' }}</span></div>
+                                </div>  
+
+                            </div>
+                            
+                        </div>
+                    </div>
+                </div>
+                </div>
+            </div>

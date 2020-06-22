@@ -1,0 +1,365 @@
+<div class="animated fadeIn">
+
+    <div class="card" *ngIf="flagFalha">
+        <div class="card-header">
+            <i class="fa fa-flag"></i>
+            <strong> Falha de comunicação </strong>
+        </div>
+
+        <div class="card-body">
+
+            <div class="alert alert-danger text-center">
+                <strong>Ocorreu um problema na sincronização. Cheque os logs para entender o problema. </strong>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="card" *ngIf="!flagFalha">
+
+        <div class="card-header">
+
+            <i class="icon-shuffle"></i>
+            <strong> Sicronização dos dados entre os servidores </strong>
+
+        </div>
+
+        <div class="card-body">
+
+            <div class="row">
+                <div class="col">
+                    <div class="alert alert-info" style="font-size: 15px;">
+                        
+                        <p>
+                            <span class="badge badge-danger" style="font-size: 14px;">Importante</span> 
+                            A sincronização precisa ser realizada com um computador rodando <strong> LINUX </strong>.
+                            Se você possui windowns, por favor, não utilize essa funcionalidade.
+                        </p>
+
+                        <p>
+                            <span class="badge badge-warning"  style="font-size: 14px;">Aviso</span> Leia com muita <strong>ATENÇÃO</strong> as instruções abaixo. Não proceda com a atualização se você possui alguma dúvida.
+                            Você pode causar sérios problemas no banco local ou remoto caso faça algo incorreto.
+                        </p>
+
+                        <p>
+                            
+                            A sincronização precisa ser realizada com um computador rodando <strong> LINUX </strong>.
+                            Se você possui windowns, por favor, não utilize essa funcionalidade.
+                        </p>
+
+                        <p> 
+                            A sincronização dos bancos funciona tanto da direção Local-Remoto quanto na Remoto-Local. Em resumo, o sincronizador simplesmente realiza
+                            a troca do banco do servidor (local ou remoto) para o banco mais recente. O sincronizador deverá ser utilizado nas seguintes situações:
+                        </p>
+
+                        <ul>
+                            <li>
+                                Antes de viajar para o PAD, <strong> SEMPRE </strong> sincronize o servidor <strong> Remoto </strong> com o <strong> Local </strong>
+                            </li>
+                            
+                            <li>
+                                Após a viaje do PAD, <strong> SEMPRE </strong> sincronize o servidor <strong> Local </strong> com o <strong> Remoto </strong>
+                            </li>
+
+                            <li>
+                                <strong> SEMPRE </strong> que alterar o banco <strong> local </strong> por qualquer motivo, sincronize-o com o <strong> remoto </strong>
+                            </li>
+
+                        </ul>
+
+                        <p>
+                            Fazendo isso sempre antes e depois da viagem, o banco estará sincronizado. Se as regras não forem seguidas, a atomicidade será perdida.
+                        </p>
+
+                        <p>
+                            Outro ponto é que você pode passar a URL do servidor remoto que deseja sincronizar os bancos. Isso é útil caso queira realizar uma sincronização interna, ou seja,
+                            enviar uma atualização para um computador interno dentro do Labcin. Caso queira sincronizar com o servidor que está no NPD, apenas deixe a  URL <span class="text-muted"> http://labcin.ufes.br/sade </span>.
+                        </p>
+
+                        <p>
+                            <span class="badge badge-info"  style="font-size: 14px;">Info</span> Para mais informações consulte o tutorial da sincronização no driver do sistema
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row" style="margin-bottom: 5px;">
+                <div class="col">
+                    <h5> <strong> Total de pacientes a sincronizar:  </strong> </h5>
+                </div>
+            </div>
+    
+            <div class="row">
+    
+                <!-- WIDGET -->
+                <div class="col-6 col-lg-6">
+                    <div class="card">
+                    <div class="card-body p-3 clearfix">
+                        <i class="fa fa-address-card bg-primary p-4 font-2xl mr-3 float-left"></i>
+                        <div class="h5 text-primary mb-0 mt-2 font-weight-bold"> {{ numPacCirSinc }} </div>
+                        <div class="text-muted text-uppercase font-weight-bold font-xs">Pacientes Cirurgia</div>
+                    </div>
+                    </div>
+                </div>
+                
+                <!-- WIDGET -->
+                <div class="col-6 col-lg-6">
+                    <div class="card">
+                    <div class="card-body p-3 clearfix">
+                        <i class="fa fa-address-card-o bg-success p-4 font-2xl mr-3 float-left"></i>
+                        <div class="h5 text-success mb-0 mt-2 font-weight-bold"> {{ numPacDerSinc }} </div>
+                        <div class="text-muted text-uppercase font-weight-bold font-xs">Pacientes Dermato</div>
+                    </div>
+                    </div>
+                </div>
+                    
+            </div>            
+
+            <!-- DIV PARA ESCOLHER A SINCRONIZACAO -->
+            <div *ngIf="sincronizando === 'nao-comecou'">
+                <div class="row">
+                    <div class="col-6">                    
+                        <div class="row" style="margin-top: 20px;">
+                            <div class="form-group col">
+                                <label for="jar" style="font-size: 14px; font-weight: bold;">Defina a URL do servidor REMOTO: </label>
+                                <div>
+                                    <input 
+                                        id="urlServer"
+                                        type="text"
+                                        class="form-control"                                             
+                                        [(ngModel)]="urlServer" 
+                                        >                             
+                                </div>
+                            </div>
+                        </div>
+                            
+                    </div>
+                </div>
+
+                <div class="row">
+                        <div class="col">
+                            <div class="row">
+                                <div class="form-group col" style="margin-top: 15px;">
+                                    <button
+                                        style="padding: 15px;"
+                                        type="button"
+                                        class="btn btn-secondary"
+                                        [disabled]="urlServer === undefined || urlServer === ''"
+                                        (click)="modalLocal.show()"
+                                    >
+                                        Sincronizar servidor LOCAL
+                                        <i class="fa fa-random"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col">
+                            <div class="row float-right">
+                                <div class="form-group col" style="margin-top: 15px;">
+                                    <button 
+                                        style="padding: 15px;"
+                                        type="button"
+                                        class="btn btn-dark"
+                                        [disabled]="urlServer === undefined || urlServer === ''"
+                                        (click)="modalRemoto.show()"
+                                    >
+                                        Sincronizar servidor REMOTO
+                                        <i class="fa fa-random"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <!-- DIV PARA ESCOLHER A SINCRONIZACAO -->
+
+                <!-- DIV COM BARRA DE PROGRESSO DO ENVIO DAS IMAGENS -->
+                <div style="margin-top: 25px;"
+                *ngIf="sincronizando === 'sincronizando-local' || sincronizando === 'sincronizando-remoto'">
+
+                        <div class="row" *ngIf="valorEnviadoImagens !== '100%'">
+                            <div class="col text-center">
+                                <h5 *ngIf="sincronizando === 'sincronizando-local'"> 
+                                    Sincronizando as imanges do o servidor <strong> local </strong>. Por favor, aguarde. 
+                                </h5>
+
+                                <h5 *ngIf="sincronizando === 'sincronizando-remoto'"> 
+                                    Sincronizando as imanges do servidor <strong> remoto </strong>. Por favor, aguarde. 
+                                </h5>
+                            </div>
+                        </div>
+
+                        <div class="row" *ngIf="valorEnviadoImagens === '100%'">
+                            <div class="col text-center">
+
+                                <h4 *ngIf="sincronizando === 'sincronizando-local'" style="color: #09723d;">  
+                                    As imagens do servidor <strong> local </strong> foram sincronizadas com sucesso!
+                                </h4>
+
+                                <h4 *ngIf="sincronizando === 'sincronizando-remoto'" style="color: #09723d;">  
+                                    As imagens do servidor <strong> remoto </strong> foram sincronizadas com sucesso!
+                                </h4>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col">
+                                <div class="progress" style="height: 35px; font-weight: bold; font-size: 14px;">                
+                                    <div 
+                                        class="progress-bar"
+                                        role="progressbar"
+                                        [ngStyle]="{'width': valorEnviadoImagens}"                    
+                                        aria-valuemin="0" aria-valuemax="100">
+                                        
+                                        {{valorEnviadoImagens}}
+                                    
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                </div>
+                <!-- DIV COM BARRA DE PROGRESSO DO ENVIO DAS IMAGENS -->                
+
+
+                <!-- DIV COM BARRA DE PROGRESSO DO BANCO DE DADOS -->
+                <div style="margin-top: 35px;"
+                *ngIf="sincronizando === 'sincronizando-local' || sincronizando === 'sincronizando-remoto'">
+
+                        <div class="row" *ngIf="valorEnviadoBanco !== '100%'">
+                            <div class="col text-center">
+                                <h5 *ngIf="sincronizando === 'sincronizando-local'"> 
+                                    Sincronizando o banco de dados do o servidor <strong> local </strong>. Por favor, aguarde. 
+                                </h5>
+
+                                <h5 *ngIf="sincronizando === 'sincronizando-remoto'"> 
+                                    Sincronizando o banco de dados do o servidor <strong> remoto </strong>. Por favor, aguarde. 
+                                </h5>
+                            </div>
+                        </div>
+        
+                        <div class="row" *ngIf="valorEnviadoBanco === '100%'">
+                            <div class="col text-center">
+
+                                <h4 *ngIf="sincronizando === 'sincronizando-local'" style="color: #09723d;">  
+                                    O banco de dados do servidor <strong> local </strong> foi sincronizado com sucesso!
+                                </h4>
+
+                                <h4 *ngIf="sincronizando === 'sincronizando-remoto'" style="color: #09723d;">  
+                                    O banco de dados do servidor <strong> local </strong> foi sincronizado com sucesso!
+                                </h4>
+                            </div>
+                        </div>
+        
+                        <div class="row">
+                            <div class="col">
+                                <div class="progress" style="height: 35px; font-weight: bold; font-size: 14px;">                
+                                    <div 
+                                        class="progress-bar"
+                                        role="progressbar"
+                                        [ngStyle]="{'width': valorEnviadoBanco}"                    
+                                        aria-valuemin="0" aria-valuemax="100">
+                                        
+                                        {{valorEnviadoBanco}}
+                                    
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                </div>
+                <!-- DIV COM BARRA DE PROGRESSO DO BANCO DE DADOS -->
+
+
+        </div>
+
+</div>
+
+<!-- MODAL SINCRONIZANDO SERVIDOR LOCAL -->
+<div bsModal #modalLocal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="modalLocal" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5> Você tem certeza que deseja sincronizar o servidor <strong> local? </strong> </h5>
+            </div>
+
+            <div class="modal-body" style="padding: 35px;">
+
+                <p>
+                    Essa operação vai baixar o banco do servidor <strong> REMOTO </strong> informado na URL e colocá-lo como o novo
+                    banco do servidor <strong> LOCAL </strong>.
+                </p>
+
+                <div class="row float-right" style="margin-top: 10px;" >
+                    <button
+                        type="button"
+                        class="btn btn-success"
+                        (click)="sincronizacaoLocal()"
+                    >
+                        Sim
+                        <i class="fa fa-check"></i>
+                    </button>
+
+                    <button
+                        style="margin-left: 15px;"
+                        type="button"
+                        class="btn btn-danger"
+                        (click)="modalLocal.hide()"
+                    >
+                        Não
+                        <i class="fa fa-close"></i>
+                    </button>
+                </div>
+                    
+            </div>        
+        </div>
+    </div>
+</div>
+<!-- MODAL SINCRONIZANDO SERVIDOR LOCAL -->
+
+
+<!-- MODAL SINCRONIZANDO SERVIDOR REMOTO -->
+<div bsModal #modalRemoto="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="modalRemoto" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+
+            <div class="modal-header">
+                <h5> Você tem certeza que deseja sincronizar o servidor <strong>remoto</strong>? </h5>
+            </div>
+
+            <div class="modal-body" style="padding: 35px;">
+
+                <p>
+                    Essa operação vai enviar o banco do servidor <strong> LOCAL </strong> para o servidor <strong> REMOTO </strong>  informado na URL e colocá-lo como
+                    o novo banco do servidor servidor <strong> REMOTO </strong>.
+                </p>
+
+                <div class="row float-right" style="margin-top: 10px;" >
+                    <button
+                        type="button"
+                        class="btn btn-success"
+                        (click)="sincronizacaoRemoto()"
+                    >
+                        Sim
+                        <i class="fa fa-check"></i>
+                    </button>
+
+                    <button
+                        style="margin-left: 15px;"
+                        type="button"
+                        class="btn btn-danger"
+                        (click)="modalRemoto.hide()"
+                    >
+                        Não
+                        <i class="fa fa-close"></i>
+                    </button>
+                </div>
+                    
+            </div>        
+        </div>
+    </div>
+</div>
+<!-- MODAL SINCRONIZANDO SERVIDOR REMOTO -->

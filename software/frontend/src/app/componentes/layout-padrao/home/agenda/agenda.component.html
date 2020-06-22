@@ -1,0 +1,33 @@
+ <div class="row">
+   <div class="col-12">
+
+      <div class="card">
+        <!-- CABEÇALHO DO CALENDÁRIO -->
+        <div class="card-header">
+          <i class="fa fa-calendar"></i> 
+          <strong> Calendário PAD 2019 </strong>
+        </div>
+
+        <!-- CORPO DO CALENDÁRIO -->
+        <div class="card-body">
+          <table class="table-bordered table-striped table-sm" style="width: 100%">
+
+            <thead>
+                <tr>
+                  <th>Local</th>
+                  <th>Data</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let item of agenda">
+                  <td>{{item.local}}</td>
+                  <td>{{item.data | dataStr}}</td>
+                </tr>
+              </tbody>
+          </table>
+        </div>
+        <!-- FIM CORPO DO CALENDÁRIO -->
+      </div>
+
+    </div>
+  </div>

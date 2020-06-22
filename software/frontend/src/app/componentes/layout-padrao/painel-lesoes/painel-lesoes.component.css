@@ -1,0 +1,35 @@
+.campo {
+    width: 100%;
+}
+
+.card-estilo {
+    padding: 8px;
+}
+
+.ativo { 
+    color: #333;
+}
+  
+.box{
+    position: relative;
+    width: 100%;
+}
+.box:before{
+    content: "";
+    display: block;
+    padding-top: 100%; /* ratio of 1:1*/
+}
+
+.conteudo {
+  position: absolute;
+  top: 5%;
+  left: 5%;
+  right: 25%;
+}
+
+.btndrop {
+    position: absolute;
+    z-index:4;
+    right:2%;
+    top:2%;
+}

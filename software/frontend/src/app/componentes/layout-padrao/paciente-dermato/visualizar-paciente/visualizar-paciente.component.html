@@ -1,0 +1,151 @@
+<div class="animated fadeIn">
+    <!--CARD CARTAO SUS VIA INPUT-->  
+    <div class="row" *ngIf = "!flagFalhaReq && !isRequisicaoURL">
+        <div class ="col-md-12">
+          <div class="card" >
+            
+            <div class="card-header">
+              <i class="fa fa-search"></i> 
+              <span class="tituloTabela">Buscar paciente</span>
+            </div>
+            
+            <div class ="card-body ">
+                  <!-- CABEÇALHO DO CADASTRO -->
+                    <form >
+                      <!-- Inform the user that the spring returned an error and could not find the pacient -->
+                      <div *ngIf="pacienteNaoEncontrado" class="alert alert-warning text-center" role="alert">
+                          <p>O(a) paciente de cartão SUS <strong>{{ cartaoSUS }}</strong> não está cadastrado no sistema.</p>
+                      </div>
+                      
+                      <div class ="form-row" >
+                          <!-- FORMGROUP - CARTAO SUS -->
+                            <div class="form-group col-md-6" >
+                              <label for="cartaoSus">Cartão SUS:
+                                  <button 
+                                    class="btn btn-info btn-sm" 
+                                    placement="right" 
+                                    popover="Para visualizar as informações do paciente, primeiro você deve informar o paciente." 
+                                    type="button">
+                                    <i class="fa fa-question"></i>
+                                  </button>  
+                              </label>
+                              <div class="input-group">
+                                  <!-- INPUT  CARTAO SUS -->
+                                  <input 
+                                    id = "cartaoSus"
+                                    type="text"
+                                    class="form-control"                     
+                                    name="cartaoSus" 
+                                    ngModel
+                                    #cartaoSus="ngModel"
+                                    [dropSpecialCharacters]="false"
+                                    mask="000-0000-0000-0000"
+                                    placeholder="000-0000-0000-0000"
+                                    [(ngModel)]="cartaoSusForm"
+                                    (keyup) = "validaCartaoSus()">
+                                    <!-- INPUT CARTAO SUS -->
+  
+                                    <div class="input-group-append">
+                                      <span class="input-group-text"><i class="fa fa-address-card-o"></i></span>
+                                    </div>
+                              </div>
+                            </div>
+                      </div>
+  
+                      <div class="form-row">
+                          <div class="text-left form-group col-md-4" >
+                              <!-- BUTTON SUBMISSAO -->
+                              <button 
+                                type="button" 
+                                class="btn btn-success"
+                                (click)="buscarPacienteCartao()"
+                                [disabled]="!cartaoSusValido">
+                                Buscar
+                                <i class="fa fa-search"></i>
+                              </button>
+                              <!-- BUTTON SUBMISSAO -->
+                          </div>  
+                      </div>
+                    </form>
+                  <!-- FIM CABEÇALHO DO CADASTRO -->
+              </div>
+          </div>
+        </div>
+      </div>
+    <!--FIM CARD CARTAO SUS VIA INPUT-->
+    
+        <div class="card" *ngIf="flagSucesso">
+            <div class="card-header">
+                <i class="fa fa-address-card-o"></i>
+                <span class="tituloTabela">Dados Paciente</span>
+
+                <div class="float-right">
+
+                    <!-- BOTÃO PARA EXPORTAR EM PDF -->
+                    <button
+                        style="margin-left: 10px;"
+                        title="Exportar em PDF"
+                        class="btn btn-danger"
+                        type="button"
+                        (click)="gerarPDF()"
+                    >    
+                        <i class="fa fa-file-pdf-o"></i>
+                    </button>
+                    <!-- BOTÃO PARA EXPORTAR EM PDF -->
+                    
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-secondary text-center" role="alert" style="margin-top: 5px;">
+                    <strong> Total de lesões: {{ this.lesoes?.length }} </strong>
+                </div>
+
+                <!-- Show Pacient information -->
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Região</th>
+                            <th>Diagnóstico</th>
+                            <th>Diagnóstico Secundário</th>
+                            <th>Mais Informações</th>
+                        </tr>
+                    </thead>
+
+                    <tbody *ngFor="let lesao of lesoes">
+                        <tr>
+                            <td>{{ lesao.regiao | nullData: 'SEM RESULTADOS' }}</td>
+                            <td>{{ lesao.diagnostico | nullData: 'SEM RESULTADOS' }}</td>
+                            <td>{{ lesao.diagnosticoSecundario | nullData: 'SEM RESULTADOS' }}</td>
+                            <td>
+                                <div>
+                                    <button
+                                        type="button"
+                                        class="btn btn-primary"
+                                        (click)="abrirModal(lesao)"
+                                    ><i class="fa fa-eye"></i></button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- PAGINAÇÃO -->
+                <div class="card-body row d-flex justify-content-center">                 
+                    <pagination 
+                        [totalItems]="totalItens"
+                        [maxSize]="maxPagLinks"
+                        [(ngModel)]="paginaAtual"
+                        (pageChanged)="mudaPagina($event)"
+                        [itemsPerPage]="itensPorPag"
+                        previousText="Anterior"
+                        nextText="Próxima"
+                    >
+                    </pagination>                        
+                </div>     
+                <div class="alert alert-secondary text-center" role="alert" style="margin-top: -20px;">
+                    <strong> Pagina {{ this.paginaAtual }} de {{ this.totalPaginas }} </strong>
+                </div>               
+                <!-- PAGINAÇÃO -->
+            </div>
+        </div>
+</div>

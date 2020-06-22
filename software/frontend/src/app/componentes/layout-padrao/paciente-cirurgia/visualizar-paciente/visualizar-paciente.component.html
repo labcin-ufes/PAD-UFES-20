@@ -1,0 +1,248 @@
+<div class="animated fadeIn">
+    <!--CARD CARTAO SUS VIA INPUT-->  
+    <div class="row" *ngIf = "!flagFalhaReq && !isRequisicaoURL">
+        <div class ="col-md-12">
+          <div class="card" >
+            
+            <div class="card-header">
+              <i class="fa fa-search"></i> 
+              <span class="tituloTabela">Buscar paciente</span>
+            </div>
+            
+            <div class ="card-body ">
+                  <!-- CABEÇALHO DO CADASTRO -->
+                    <form >
+                      <!-- Inform the user that the spring returned an error and could not find the pacient -->
+                        <div *ngIf="pacienteNaoEncontrado" class="alert alert-warning text-center" role="alert">
+                            <p>O(a) paciente de cartão SUS <strong>{{ cartaoSUS }}</strong> não está cadastrado no sistema.</p>
+                        </div>
+
+                      <!-- Inform the user that the SUS card is missformatted -->
+                        <div *ngIf="cartaoSusInvalidoURL" class="alert alert-warning text-center" role="alert">
+                            <p>O cartão SUS <strong>{{ cartaoSUS }}</strong> parece errado. Confirme se digitou no formato XXX-XXXX-XXXX-XXXX, por favor.</p>
+                        </div>
+                      
+                      <div class ="form-row" >
+                          <!-- FORMGROUP - CARTAO SUS -->
+                            <div class="form-group col-md-6" >
+                              <label for="cartaoSus">Cartão SUS:
+                                  <button 
+                                    class="btn btn-info btn-sm" 
+                                    placement="right" 
+                                    popover="Para visualizar as informações do paciente, primeiro você deve informar o paciente." 
+                                    type="button">
+                                    <i class="fa fa-question"></i>
+                                  </button>  
+                              </label>
+                              <div class="input-group">
+                                  <!-- INPUT  CARTAO SUS -->
+                                  <input 
+                                    id = "cartaoSus"
+                                    type="text"
+                                    class="form-control"                     
+                                    name="cartaoSus" 
+                                    ngModel
+                                    #cartaoSus="ngModel"
+                                    [dropSpecialCharacters]="false"
+                                    mask="000-0000-0000-0000"
+                                    placeholder="000-0000-0000-0000"
+                                    [(ngModel)]="cartaoSusForm"
+                                    (keyup) = "validaCartaoSus()">
+                                    <!-- INPUT CARTAO SUS -->
+  
+                                    <div class="input-group-append">
+                                      <span class="input-group-text"><i class="fa fa-address-card-o"></i></span>
+                                    </div>
+                              </div>
+                            </div>
+                      </div>
+  
+                      <div class="form-row">
+                          <div class="text-left form-group col-md-4" >
+                              <!-- BUTTON SUBMISSAO -->
+                              <button 
+                                type="button" 
+                                class="btn btn-success"
+                                (click)="buscarPacienteCartao()"
+                                [disabled]="!cartaoSusValido">
+                                Buscar
+                                <i class="fa fa-search"></i>
+                              </button>
+                              <!-- BUTTON SUBMISSAO -->
+                          </div>  
+                      </div>
+                    </form>
+                  <!-- FIM CABEÇALHO DO CADASTRO -->
+              </div>
+          </div>
+        </div>
+      </div>
+    <!--FIM CARD CARTAO SUS VIA INPUT-->
+    
+        <div class="card" *ngIf="flagSucesso">
+            <div class="card-header">
+                <i class="fa fa-address-card-o"></i>
+                <span class="tituloTabela">Dados Paciente</span>
+
+                <div class="float-right">
+                    <!-- LINK PARA EDIÇÃO DO PACIENTE -->
+                    <a
+                        title="Editar paciente"
+                        class="btn btn-success"
+                        routerLink="/dashboard/paciente-cirurgia/editar-paciente/{{paciente.cartaoSus}}"
+                        target="_blank"
+                    >    
+                        <i class="fa fa-edit"></i>
+                    </a>
+                    <!-- LINK PARA EDIÇÃO DO PACIENTE -->
+
+                    <!-- BOTÃO PARA EXPORTAR EM PDF -->
+                    <button
+                        style="margin-left: 10px;"
+                        title="Exportar em PDF"
+                        class="btn btn-danger"
+                        type="button"
+                        (click)="gerarPDF()"
+                    >    
+                        <i class="fa fa-file-pdf-o"></i>
+                    </button>
+                    <!-- BOTÃO PARA EXPORTAR EM PDF -->
+                </div>
+            </div>
+            <div class="card-body">
+                <!-- Show Pacient information -->
+                <div>
+                    <tabset>
+                        <tab id="tab1">
+                            <ng-template tabHeading>
+                                <strong>Informações pessoais</strong>
+                            </ng-template>
+                            <div class="row">
+                                <div class="col-md-10">
+                                    <p ><strong>Nome: </strong>{{paciente.nomeCompleto}}</p>
+                                    <p ><strong>Número do prontuário: </strong>{{paciente.prontuario}}</p>
+                                    <p ><strong>Número do cartão do SUS: </strong>{{paciente.cartaoSus}}</p>
+                                    <p ><strong>Nome da mãe: </strong>{{paciente.nomeMae}}</p>
+                                    <p ><strong>Data de Nascimento: </strong>{{paciente.dataNascimento | dataStr}}</p>
+                                    <p ><strong>Idade: </strong>{{paciente.dataNascimento | idade}} anos</p>
+                                    <p ><strong>Sexo: </strong>{{paciente.sexo}}</p>
+                                    <p ><strong>Estado civil: </strong>{{paciente.estadoCivil}}</p>
+                                    <p ><strong>Local de nascimento: </strong>{{paciente.localNascimento}}</p>
+                                    <p ><strong>Origem familiar paterna: </strong>{{paciente.origemFamiliarPai}}</p>
+                                    <p ><strong>Origem familiar materna: </strong>{{paciente.origemFamiliarMae}}</p>
+                                    <p ><strong>Atividade principal: </strong>{{paciente.atvPrincipal}}</p>
+                                    <p ><strong>Idade em que começou a exercê-la: </strong>{{paciente.idadeInicioAtv}} anos</p>
+                                    <p ><strong>Local do último atendimento: </strong>{{paciente.localUltimoAtendimento}}</p>
+                                    <p ><strong>Data do último atendimento: </strong>{{paciente.dataUltimoAtendimento | dataStr}}</p>
+                                    <p ><strong>Número de vezes que já foi atendido pelo PAD: </strong>{{paciente.numVezesAtendido}}</p>
+                                    <p ><strong>Endereço: </strong>{{paciente.endereco}}</p>
+                                </div>
+                            </div>
+                        </tab>
+                        <tab>
+                            <ng-template tabHeading>
+                                <strong>Informações do cotidiano e socioeconômicas</strong>
+                            </ng-template>
+                            <div class="row">
+                                <div class="col-md-10">
+                                    <p><strong>Tempo de exposição ao sol por dia: </strong>{{paciente.expSol}} horas</p>
+                                    <p><strong>Parte do dia em que fica mais exposto: </strong>{{paciente.horaExpSol}}</p>
+                                    <p><strong>Contato com agrotóxico: </strong>{{paciente.usoAgrotoxico}}</p>
+                                    <p><strong>Uso de bebida: </strong>{{paciente.usoBebida}}</p>
+                                    <p><strong>Uso de cigarro: </strong>{{paciente.usoCigarro}}</p>
+                                    <p><strong>Uso de chapéu: </strong>{{paciente.usoChapeu}}</p>
+                                    <p><strong>Uso de calças compridas: </strong>{{paciente.usoCalcaCumprida}}</p>
+                                    <p><strong>Uso de camisa de mangas compridas: </strong>{{paciente.usoMangaCumprida}}</p>
+                                    <p><strong>Uso de filtro solar: </strong>{{paciente.usoFiltroSolar}}</p>
+                                    <p><strong>Renda familiar: </strong>{{paciente.renda}}</p>
+                                    <p><strong>Número de pessoas que vive na residência: </strong>{{paciente.numPessoasCasa}}</p>
+                                    <p><strong>Agua encanada: </strong>{{paciente.aguaEncanada}}</p>
+                                    <p><strong>Rede esgoto: </strong>{{paciente.redeEsgoto}}</p>
+                                    <p><strong>Observação em geral: </strong>{{paciente.obs}}</p>
+                                </div>
+                            </div>
+                        </tab>
+                        <tab>
+                            <ng-template tabHeading>
+                                <strong>Informações técnicas</strong>
+                            </ng-template>
+                            <div class="row">
+                                <div class="col-md-10">
+                                    <p><strong>Tipo de pele: </strong>{{paciente.tipoPele}}</p>
+                                    <p><strong>Grau de destrofia solar: </strong>{{paciente.destrofiaSolar}}</p>
+                                    <p><strong>Alergia a medicamento: </strong>{{paciente.alergia}}</p>
+                                    <p><strong>Diabetes: </strong>{{paciente.diabetes}}</p>
+                                    <p><strong>Anticoagulante: </strong>{{paciente.usoAnticoagulante}}</p>
+                                    <p><strong>Pressão arterial sistolica: </strong>{{paciente.presArtSistolica}}</p>
+                                    <p><strong>Pressão arterial diastolica: </strong>{{paciente.presArtDiastolica}}</p>
+                                    <p><strong>HAS: </strong>{{paciente.hipertensao}}</p>
+                                    <p><strong>Histórico de câncer de pele na família: </strong>{{paciente.histCancerPele}}</p>
+                                    <p><strong>Histórico de outro câncer na família: </strong>{{paciente.histCancer}}</p>
+                                </div>
+                            </div>   
+                        </tab>
+                        <tab (select)="mostraLesoes()" (select)="flagTotalLesoes = true" (deselect)="flagTotalLesoes = false">
+                            <div *ngIf="flagTotalLesoes" class="alert alert-secondary text-center" role="alert" style="margin-top: 5px;">
+                                <strong> Total de lesões: {{ this.lesoesPag?.length }} </strong>
+                            </div>
+
+                            <ng-template tabHeading>
+                                <strong>Informações sobre as lesões</strong>
+                            </ng-template>
+                            <div  class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Diagnóstico Clínico</th>
+                                        <th scope="col">Diagnóstico Histopatológico</th>
+                                        <th scope="col">Região</th>
+                                        <th scope="col">Procedimento</th>
+                                        <th scope="col">Mais Informações</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody *ngFor="let lesao of lesoesPag">
+                                    <tr scope="row">
+                                        <td>{{lesao.diagnosticoClinico}}</td>
+                                        <td>
+                                            {{lesao.diagnosticoHisto | nullData:'SEM RESULTADO'}}
+                                        </td>
+                                        <td>{{lesao.regiao}}</td>
+                                        <td>{{lesao.procedimento}}</td>
+                                        <td>
+                                            <div>
+                                                <button
+                                                    type="button"
+                                                    class="btn btn-primary"
+                                                    (click)="abrirModal(template,lesao)"
+                                                ><i class="fa fa-eye"></i></button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            </div>
+
+                            <!-- PAGINAÇÃO -->
+                            <div class="card-body row d-flex justify-content-center">                 
+                                <pagination 
+                                    [totalItems]="totalItens"
+                                    [maxSize]="maxPagLinks"
+                                    [(ngModel)]="paginaAtual"
+                                    (pageChanged)="mudaPagina($event)"
+                                    [itemsPerPage]="itensPorPag"
+                                    previousText="Anterior"
+                                    nextText="Próxima"
+                                >
+                                </pagination>                        
+                            </div>     
+                            <div class="alert alert-secondary text-center" role="alert" style="margin-top: -20px;">
+                                <strong> Pagina {{ this.paginaAtual }} de {{ this.totalPaginas }} </strong>
+                            </div>               
+                            <!-- PAGINAÇÃO -->
+                        </tab>
+                    </tabset>
+                </div>
+            </div>
+        </div>
+</div>

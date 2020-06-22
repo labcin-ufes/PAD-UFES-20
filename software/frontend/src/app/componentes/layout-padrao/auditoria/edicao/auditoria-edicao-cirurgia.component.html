@@ -1,0 +1,540 @@
+<div class="card" *ngIf="!cropando">
+
+    <div class="card-header">
+        <i class="fa fa-crop custom"></i>
+        <strong> Auditando lesão cirurgia </strong>        
+    </div> 
+
+    <div class="card-body">
+        <form
+            #dadosLesao="ngForm" 
+            (ngSubmit)="salvarAuditoria()"
+            >
+
+            <!-- TOPO COM SWITCH E BOTAO VOLTAR -->
+            <div class="row">
+
+                <div class="col-3">
+                        <button
+                        type="button"
+                        class="btn btn-info"
+                        (click)="cancelarAuditoria()"
+                    >
+                    <i class="fa fa-arrow-left"></i>
+                    Voltar
+                    
+                    </button>
+                </div>
+
+                <div class="col-7"></div>
+                
+                <div class="col-2">
+                    <label for="auditado"> <strong> Auditado? </strong> </label>
+                    <div>
+                        <label class="switch switch-label switch-primary">
+                            <input 
+                                type="checkbox" 
+                                class="switch-input"                                                 
+                                ngModel
+                                [ngModel]="false"
+                                name="auditado"
+                            >
+                            <span 
+                                class="switch-slider" 
+                                data-checked="Sim" 
+                                data-unchecked="Não">
+                            </span>
+                        </label>
+                    </div>
+                </div>
+
+            </div>
+            <!-- TOPO COM SWITCH E BOTAO VOLTAR -->            
+
+            <!-- LINHA 1 DO FORM DE LESAO -->
+            <div class="row">
+
+                <!-- DIAGNOSTICO CLINICO -->
+                <div class="form-group col-sm-6">
+                    <label for="diagCli">Diagnóstico clínico*: </label>
+                    <div>
+                        <input 
+                            type="text" 
+                            id="diagCli"
+                            class="form-control"                                        
+                            ngModel
+                            name="diagnosticoClinico"
+                            [ngModel]="lesao.diagnosticoClinico"
+                            #diagCli="ngModel"
+                            [ngbTypeahead]="completarDiagnostico"  
+                            minlength="3"
+                            required                                   
+                        >
+                        <small 
+                            *ngIf="diagCli.invalid && diagCli.touched" 
+                            class="form-text text-danger">
+                                Diagnóstico clínico é obrigatório
+                        </small>
+                    </div>
+                </div>
+                <!-- DIAGNOSTICO CLINICO -->
+
+                <!-- DIAGNOSTICO HISTOPATOLOGICO -->
+                <div class="form-group col-sm-6">
+                    <label for="diagCli2">Histopatológico*: </label>
+                    <div>
+                        <input 
+                            type="text" 
+                            id="diagHisto"
+                            class="form-control"                                        
+                            ngModel
+                            [ngModel]="lesao.diagnosticoHisto"
+                            name="diagnosticoHisto"
+                            minlength="3"
+                            [ngbTypeahead]="completarDiagnostico"
+                            required                                                                               
+                        >                                
+                    </div>
+                </div>
+                <!-- DIAGNOSTICO SECUNDARIO -->
+                
+            </div>
+            <!-- LINHA 1 DO FORM DE LESAO -->
+
+            <!-- LINHA 2 DO FORM DE LESAO -->
+            <div class="row">
+
+                <!-- REGIAO -->
+                <div class="form-group col-sm-6">
+                    <label for="regiao">Região da lesão*: </label>
+                    <div>
+                        <input 
+                            type="text" 
+                            id="regiao"
+                            class="form-control"                                        
+                            ngModel
+                            [ngModel]="lesao.regiao"
+                            name="regiao"
+                            #regiao="ngModel"
+                            [ngbTypeahead]="completarRegiao"
+                            (change)="buscaGrandeRegiao(this.dadosLesao.value.regiao)"
+                            minlength="2"
+                            required                                                                            
+                        >                                
+                    </div>
+                    <small 
+                        *ngIf="regiao.invalid && regiao.touched" 
+                        class="form-text text-danger">
+                            Região da lesão obrigatório
+                    </small>
+                </div>
+                <!-- REGIAO -->
+
+                <!-- DIAMETRO MAIOR -->
+                <div class="form-group col-sm-3">
+                    <label for="diaM">Diâmetro maior (mm)*: </label>
+                    <div>
+                        <input 
+                            type="number" 
+                            id="diaM"
+                            class="form-control"                                        
+                            ngModel
+                            [ngModel]="lesao.diametroMaior"
+                            #diaMaior="ngModel"
+                            name="diametroMaior"   
+                            required                                                                            
+                        >                                
+                    </div>
+                    <small 
+                        *ngIf="diaMaior.invalid && diaMaior.touched" 
+                        class="form-text text-danger">
+                            Diametro maior obrigatório
+                    </small>
+                </div>
+                <!-- DIAMETRO MAIOR -->
+
+                <!-- DIAMETRO MENOR -->
+                <div class="form-group col-sm-3">
+                    <label for="diaMe">Diâmetro menor (mm)*: </label>
+                    <div>
+                        <input 
+                            type="number" 
+                            id="diaMe"
+                            class="form-control"                                        
+                            ngModel
+                            #diaMenor="ngModel"
+                            [ngModel]="lesao.diametroMenor"
+                            name="diametroMenor"                                               
+                            required                                                                            
+                        >                                
+                    </div>  
+                    <small 
+                        *ngIf="diaMenor.invalid && diaMenor.touched" 
+                        class="form-text text-danger">
+                            Diametro menor obrigatório
+                    </small>                                  
+                </div>
+                <!-- DIAMETRO MENOR -->
+            </div>
+            <!-- LINHA 2 DO FORM DE LESAO -->
+
+            <!-- LINHA 3 DO FORM DE LESAO -->
+            <div class="row">
+                
+                <!-- DATA PROCEDIMENTO -->
+                <div class="form-group col-sm-3">                                    
+                    <label for="data">Data do procedimento*: </label>
+                    <div>
+                        <input 
+                            type="date" 
+                            data-date-format="dd/MM/yyyy"
+                            validatedateformat
+                            id="data"
+                            class="form-control"                                        
+                            ngModel
+                            [ngModel]="lesao.dataProcedimento"
+                            #dataProc="ngModel"
+                            name="dataProcedimento"   
+                            required                                                                            
+                        >                       
+                    </div>
+                    <small 
+                        *ngIf="dataProc.invalid && dataProc.touched" 
+                        class="form-text text-danger">
+                            Data do procedimento obrigatória
+                    </small>                                    
+                </div>
+                <!-- DATA PROCEDIMENTO -->
+
+                <!-- LOCAL PROCEDIMENTO -->
+                <div class="form-group col-sm-4">                                    
+                    <label for="local">Local do procedimento*: </label>
+                    <div>
+                        <input 
+                            type="text" 
+                            id="local"
+                            class="form-control"                                        
+                            ngModel
+                            [ngModel]="lesao.localProcedimento"
+                            #localProc="ngModel"
+                            name="localProcedimento"
+                            [ngbTypeahead]="completarLocal" 
+                            required                                                                            
+                        >                                
+                    </div>  
+                    <small 
+                        *ngIf="localProc.invalid && localProc.touched" 
+                        class="form-text text-danger">
+                            Local do procedimento obrigatório
+                    </small>                                   
+                </div>
+                <!-- LOCAL PROCEDIMENTO -->
+
+                <!-- CIRURGIAO -->
+                <div class="form-group col-sm-5">                                    
+                    <label for="cirurgiao">Cirurgiao*: </label>
+                    <div>
+                        <input 
+                            type="text" 
+                            id="cirurgiao"
+                            class="form-control"                                        
+                            ngModel
+                            [ngModel]="lesao.cirurgiao"
+                            #cirurgiao="ngModel"
+                            name="cirurgiao" 
+                            [ngbTypeahead]="completarCirurgiao"   
+                            required                                                                            
+                        >                                
+                    </div>   
+                    <small 
+                        *ngIf="cirurgiao.invalid && cirurgiao.touched" 
+                        class="form-text text-danger">
+                            Nome do cirurgião obrigatório
+                    </small>                                  
+                </div>
+                <!-- CIRURGIAO -->
+
+            </div>
+            <!-- LINHA 3 DO FORM DE LESAO -->
+
+            <!-- LINHA 4 DO FORM DE LESAO -->
+            <div class="row">
+
+                <!-- PROCEDIMENTO -->
+                <div class="form-grup col-sm-3">
+                    <label for="obs">Procedimento*: </label>
+                    <div>
+                        <input 
+                            type="text" 
+                            id="procedimento"
+                            class="form-control"                                        
+                            ngModel
+                            [ngModel]="lesao.procedimento"
+                            #proc="ngModel"
+                            name="procedimento"
+                            [ngbTypeahead]="completarProcedimento"                                                                                                                     
+                            required
+                        >                                
+                    </div> 
+                    <small 
+                        *ngIf="proc.invalid && proc.touched" 
+                        class="form-text text-danger">
+                            Procedimento obrigatório
+                    </small> 
+                </div>
+                <!-- PROCEDIMENTO -->
+
+                <!-- OBSERVACAO -->
+                <div class="form-grup col-sm-5">
+                    <label for="obs">Observação: </label>
+                    <div>
+                        <input 
+                            type="text" 
+                            id="obs"
+                            class="form-control"                                        
+                            ngModel
+                            [ngModel]="lesao.obs"
+                            name="obs"                                                                                                                     
+                        >                                
+                    </div> 
+                </div>
+                <!-- OBSERVACAO --> 
+
+                <!-- GRANDE REGIAO -->
+                <div class="form-group col-sm-4">
+                    <label for="regiao">Grande região: </label>
+                    <div>
+                        <input 
+                            type="text" 
+                            id="grandeRegiao"
+                            class="form-control"                                        
+                            ngModel
+                            [ngModel]="lesao.grandeRegiao"
+                            name="grandeRegiao"       
+                            #grandeRegiao="ngModel"                                                                                                                                               
+                        >                                
+                    </div>
+                    <small 
+                        *ngIf="grandeRegiao.value === 'NÃO ENCONTRADO' || grandeRegiao.value === '' || grandeRegiao.value === 'NULL'"
+                        class="form-text text-danger">
+                            Grande região não encontrada!
+                    </small>
+                    
+                </div>
+                <!-- GRANDE REGIAO -->
+            </div>
+            <!-- LINHA 3 DO FORM DE LESAO -->
+
+
+        <!-- IMAGENS DA LESAO -->
+        <div class="row" *ngIf="imagens !== undefined" style="margin-top: 25px;">
+
+            <div class="col-12 alert alert-warning text-center" *ngIf="imagens.length <= 0">
+                <strong> A lesão não possui imagens cadastradas </strong>
+                
+            </div>
+
+            <div class="col">
+
+                <div class="card" *ngIf="imagens.length > 0">
+                    
+                    <div class="card-header">
+                        <i class="fa fa-image"></i>
+                        <strong> Imagens </strong>
+                    </div>
+
+                    <div class="card-body">
+
+                        <div class="row">
+                            <div class="col-4" *ngFor="let imagem of imagens">
+                                <div class="card">
+                                        <a href="{{url_api}}/api/imagem/baixar?nomeImg={{imagem.path}}&tipo=cirurgia" target="_blank">
+                                            <img src="{{url_api}}/api/imagem/baixar?nomeImg={{imagem.path}}&tipo=cirurgia&largura=250&altura=250"
+                                            alt="Lesão"
+                                            class="card-img-top">
+                                        </a>
+
+                                        <div class="card-body" style="padding: 30px;">
+
+                                            <div class="row">
+                                                <h6 class="card-title"> <strong> Path:</strong> <small> {{imagem.path}} </small></h6>  
+                                            </div>
+                                            
+                                            <div class="row float-right">
+
+                                                <div>
+
+                                                    <button
+                                                        type="button"
+                                                        class="btn btn-info"
+                                                        (click)="setarCropando(imagem)"
+                                                    >
+                                                        Cropar
+                                                        <i class="fa fa-crop custom"></i>
+                                                    </button>
+
+                                                </div>
+
+                                                <div style="margin-left: 10px;">
+
+                                                    <!-- EXCLUSÃO DE IMAGEM -->
+                                                    <div 
+                                                        class="btn-group" 
+                                                        dropdown 
+                                                        #dropdown="bs-dropdown"
+                                                        [autoClose]="true" 
+                                                        [insideClick]="true"
+                                                    >
+
+                                                        <button 
+                                                            id="button-basic" 
+                                                            dropdownToggle 
+                                                            type="button" 
+                                                            class="btn btn-danger dropdown-toggle"
+                                                            aria-controls="dropdown-basic"
+                                                        >
+                                                            Excluir
+                                                            <i class="fa fa-trash"></i>
+                                                        </button>
+
+                                                            <div id="dropdown-basic" *dropdownMenu class="dropdown-menu"
+                                                                role="menu" aria-labelledby="button-basic">
+
+                                                                <div class="px-4 py-3">
+                                                                
+                                                                    <div class="form-group">
+
+                                                                        <label for="apagar">Tem certeza que deseja excluir a imagem?</label>
+                                                                        <button 
+                                                                            type="button" 
+                                                                            id="apagar"
+                                                                            class="btn btn-success"
+                                                                            (click)="excluirImagem(imagem)"
+                                                                        >
+                                                                            Sim
+                                                                        </button>
+
+                                                                        <button 
+                                                                            type="button" 
+                                                                            class="btn btn-danger"
+                                                                            (click)="dropdown.hide()"
+                                                                        >
+                                                                            Não
+                                                                        </button>
+                                                                    </div>
+                                                                    
+                                                                </div>
+                                                                
+                                                            </div>
+                                                    </div>
+                                                    <!-- EXCLUSÃO DE IMAGEM -->
+
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+                                </div>
+                            </div>
+                        </div>
+
+                            
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+        <!-- IMAGENS DA LESAO -->
+
+            
+            <!-- BOTAO DE ENVIO -->
+            <div class="form-group float-right" style="margin-top: 15px;">
+                <button
+                    type="submit"
+                    [disabled]="dadosLesao.invalid"
+                    class="btn btn-success btn-lg"
+                >
+                Salvar
+                <i class="fa fa-check"></i>
+                </button>
+                
+                <button
+                    type="button"
+                    class="btn btn-danger btn-lg"
+                    style="margin-left: 5px;"
+                    (click)="modalExcluir.show()"
+                >
+                    Excluir
+                    <i class="fa fa-trash"></i>
+                </button>
+            </div>
+            
+            <!-- BOTAO DE ENVIO -->
+
+
+        </form>
+        <!-- FORM INSERÇÃO DA LESÃO -->
+    </div>
+
+
+    <!-- MODAL EXCLUIR LESAO -->
+    <div bsModal #modalExcluir="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h4 class="modal-title"> Tem certeza que deseja excluir a lesão? </h4>
+                    <button type="button" class="close" (click)="modalExcluir.hide()" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+            <div class="modal-body" style="padding: 35px;">
+
+                <div class="row float-right" >
+                    <button
+                        type="button"
+                        class="btn btn-success"
+                        (click)="excluirLesao()"
+                    >
+                        Sim
+                        <i class="fa fa-check"></i>
+                    </button>
+
+                    <button
+                        style="margin-left: 15px;"
+                        type="button"
+                        class="btn btn-danger"
+                        (click)="modalExcluir.hide()"
+                    >
+                        Não
+                        <i class="fa fa-close"></i>
+                    </button>
+                </div>
+                
+            </div>
+
+            </div>
+        </div>
+    </div>
+    <!-- MODAL EXCLUIR LESAO -->    
+
+</div>
+
+
+<!-- EDICAO DAS IMAGENS -->
+
+<app-auditoria-edicao-imagem
+    *ngIf="cropando"
+    [urlLesao]="lesao._links.self.href"
+    [imgParaCrop]="imgParaCrop"
+    [tipoPac]="'cirurgia'"
+    (eventoImagemCropada)="pegaEventoImagemCropada($event)"
+>
+    
+</app-auditoria-edicao-imagem>
+
+<!-- EDICAO DAS IMAGENS -->

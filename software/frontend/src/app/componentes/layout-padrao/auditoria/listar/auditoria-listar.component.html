@@ -1,0 +1,146 @@
+<!-- CASO A OCORRA ALGUMA FALHA -->
+<div class="card .mx-auto" *ngIf="flagFalha">
+    <div class="card-header">
+        <h4> Falha de comunicação </h4>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-danger text-center" role="alert">                        
+            Infelizmente ocorreu uma falha de comunicação no sistema. Tente acessar novamente ou mais tarde. Caso persista, entre em contato com os desenvolvedores
+        </div>
+    </div>
+</div>
+<!-- CASO A OCORRA ALGUMA FALHA -->
+
+
+<div class="card" *ngIf="!flagFalha">
+
+    <div class="card-header">
+        <i class="fa fa-th-list"></i>
+        <strong> Lista de pacientes {{ tipoPac }} não auditados </strong>
+    </div>
+
+    <div class="card-body">
+
+            <div 
+                class="alert alert-success text-center" 
+                role="alert" 
+                *ngIf="respAuditoria === 'auditoria-paciente-auditado' && paciente !== undefined"
+            >
+                <strong> Paciente auditado com sucesso! </strong>
+            </div>     
+                       
+
+            <div class="alert alert-secondary text-center" role="alert">
+                <strong> Total de pacientes não auditados: {{ this.totalItens }} </strong>
+            </div>          
+           
+            <table class="table table-striped" *ngIf="tipoPac === 'cirurgia'">                            
+                <thead>
+                    <tr>
+                        <th>Check</th>
+                        <th>Cartão do SUS </th>
+                        <th>Nome</th>                                                    
+                        <th>Idade</th>   
+                        <th>Último atendimento</th>   
+                        <th>Local</th>
+                        <th>Auditado?</th>
+                        <th>Lesoes</th>
+                        
+                    </tr>
+                </thead>
+
+                <tbody *ngFor=" let paciente of pacientes">
+                    <tr>
+                        <td>
+                            <button
+                                type="button"
+                                class="btn btn-success"
+                                (click)="marcarComoAuditado(paciente._links.self.href)"
+                            >
+                                <i class="fa fa-check"></i>
+                            </button>
+                        </td>  
+                        <td>{{ paciente.cartaoSus }}</td>
+                        <td>{{ paciente.nomeCompleto }}</td>
+                        <td>{{ paciente.dataNascimento | idade }}</td>
+                        <td>{{ paciente.dataUltimoAtendimento | dataStr}}</td>
+                        <td>{{ paciente.localUltimoAtendimento }}</td>
+                        <td>
+                            <span *ngIf="paciente.auditado" class="badge badge-success">Sim</span>
+                            <span *ngIf="!paciente.auditado" class="badge badge-danger">Não</span>
+                        </td>                                                
+                        <td>
+                                <button
+                                    type="button"
+                                    class="btn btn-secondary"
+                                    (click)="emitePacSelecionado(paciente)"
+                                    
+                                >
+                                    <i class="fa fa-medkit"></i>
+                                </button>
+                        </td>                   
+                    </tr>
+                </tbody>
+            </table>
+
+            <table class="table table-striped" *ngIf="tipoPac === 'dermato'">                            
+                <thead>
+                    <tr>
+                        <th> Check </th>
+                        <th> Cartão do SUS </th>
+                        <th> Auditado </th>
+                        <th> Lesões </th>
+                    </tr>
+                </thead>
+
+                <tbody *ngFor=" let paciente of pacientes">
+                    <tr>
+                        <td>
+                            <button
+                                type="button"
+                                class="btn btn-success"
+                                (click)="marcarComoAuditado(paciente._links.self.href)"
+                            >
+                                <i class="fa fa-check"></i>
+                            </button>
+
+                        </td>
+                        <td>{{ paciente.cartaoSus }}</td>                                              
+                        <td>
+                            <span *ngIf="paciente.auditado" class="badge badge-success">Sim</span>
+                            <span *ngIf="!paciente.auditado" class="badge badge-danger">Não</span>
+                        </td>
+                        <td>
+                                <button
+                                    type="button"
+                                    class="btn btn-secondary"
+                                    (click)="emitePacSelecionado(paciente)"
+                                >
+                                    <i class="fa fa-medkit"></i>
+                                </button>
+                        </td>                   
+                    </tr>
+                </tbody>
+            </table>            
+
+        <!-- PAGINAÇÃO -->
+        <div class="card-body row d-flex justify-content-center">                 
+            <pagination 
+                [totalItems]="totalItens"
+                [maxSize]="maxPagLinks"
+                [(ngModel)]="paginaAtual"
+                (pageChanged)="mudaPagina($event)"
+                [itemsPerPage]="itensPorPag"
+                previousText="Anterior"
+                nextText="Próxima"
+            >
+            </pagination>                        
+        </div>     
+        <div class="alert alert-secondary text-center" role="alert" style="margin-top: -20px;">
+            <strong> Pagina {{ this.paginaAtual }} de {{ this.totalPaginas }} </strong>
+        </div>               
+        <!-- PAGINAÇÃO -->
+
+    </div>    
+
+</div>

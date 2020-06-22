@@ -1,0 +1,241 @@
+<!-- CASO A REQUISIÇÃO FALHE -->
+<div class="card .mx-auto" *ngIf="flagFalha">
+    <div class="card-header">
+        <h4> Falha de comunicação </h4>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-danger text-center" role="alert">                        
+            <p>Infelizmente ocorreu uma falha de comunicação no sistema. Tente acessar novamente ou mais tarde. Caso persista, entre em contato com os desenvolvedores</p>
+        </div>
+    </div>
+</div>
+
+<div class="row" *ngIf="!flagFalha">
+    <div class="col-12">
+
+        <!-- FILTRO -->
+        <div class="card">
+
+            <!-- CABEÇALHO -->
+            <div class="card-header">
+                <i class="fa fa-filter"></i> 
+                <span class="tituloTabela">Filtrar lesões</span>
+            </div>
+
+            <div class="card-body">
+
+                <!-- FORMULÁRIO DE PESQUISA -->
+                <form #dadosForm="ngForm" (ngSubmit)="recebeDadosForm()">
+                    <div class="row">
+
+                        <!-- FILTRO DIAGNOSTICO CLINICO-->
+                        <div class="form-group col-sm-4">
+                            <label for="diagCli">Diagnóstico clínico: </label>
+                            <div>
+                                <input 
+                                    id="diagCli" 
+                                    type="text" 
+                                    class="form-control" 
+                                    [(ngModel)]="nomeDiagCliComp"
+                                    name="diagClinico" 
+                                    [ngbTypeahead]="buscaDiagnostico"
+                                />                             
+                            </div>                                
+                        </div>
+                        <!-- FILTRO DIAGNOSTICO CLINICO-->   
+
+                        <!-- FILTRO DIAGNOSTICO HISTO-->
+                        <div class="form-group col-sm-4" *ngIf="tipoPainel==='cirurgia'">
+                            <label for="diagHisto">Diagnóstico Histopatológico: </label>
+                            <div>
+                                <input 
+                                    id="diagHisto" 
+                                    type="text" 
+                                    class="form-control" 
+                                    [(ngModel)]="nomeDiagHistoComp"
+                                    name="diagHisto" 
+                                    [ngbTypeahead]="buscaDiagnostico"
+                                />                                
+                            </div>                                
+                        </div>
+                        <!-- FILTRO DIAGNOSTICO HISTO-->
+
+                        <!-- FILTRO POR REGIAO DA LESAO -->
+                        <div class="form-group col-sm-4">
+                            <label for="regiao">Região da lesão: </label>
+                            <div>
+                                <input 
+                                    id="regiao" 
+                                    type="text" 
+                                    class="form-control" 
+                                    [(ngModel)]="nomeRegiaoComp"
+                                    name="regiao" 
+                                    [ngbTypeahead]="buscaRegiao"
+                                />                                
+                            </div>
+                        </div>
+                        <!-- FILTRO POR REGIAO DA LESAO -->
+                    </div>
+
+                    <div class="form-group form-actions row col-12">
+                        <button class="btn btn-success btn-md" type="submit">
+                            <i class="fa fa-search"></i> Filtrar lesões
+                        </button>
+                    </div>
+
+                </form>
+                <!-- FIM FORMULÁRIO DE PESQUISA -->
+            
+            </div>
+        </div>
+        <!-- FIM FILTRO -->
+
+        <!-- PAINEL DE LESÕES -->
+        <div class="card">
+
+                <!-- CABEÇALHO -->
+                <div class="card-header">
+                    <i class="fa fa-th-large"></i>Painel de lesões
+                    <div class="card-header-actions">
+                        <button type="button"
+                                class="card-header-action btn btn-link"
+                                [ngClass]="exibirImagensGrandes?'':'ativo'"
+                                (click)="alteraModoExibicao('pequeno')">
+                            <i class="fa fa-th"></i>
+                        </button>
+                        <button type="button"
+                                class="card-header-action btn btn-link"
+                                [ngClass]="exibirImagensGrandes?'ativo':''"
+                                (click)="alteraModoExibicao('grande')">
+                            <i class="fa fa-th-large"></i>
+                        </button>
+                    </div>
+                </div>
+    
+                <div class="card-body">
+                    
+                    <!-- IMAGENS GRANDES -->
+                    <div class="row" *ngIf="exibirImagensGrandes">
+                        <div class="col-sm-6 col-md-3" *ngFor="let lesao of lesoes">
+                            <div class="card">
+
+                                <!-- CARROSSEL -->
+                                <carousel *ngIf="lesao.imagens.length" [showIndicators]="false">
+                                    <slide *ngFor="let imagem of lesao.imagens">
+                                        <a href="{{url_api}}/api/imagem/baixar?nomeImg={{imagem.path}}&tipo={{tipoPainel}}" target="_blank">
+                                            <img src="{{url_api}}/api/imagem/baixar?nomeImg={{imagem.path}}&tipo={{tipoPainel}}&largura=200&altura=200"
+                                            alt="Lesão"
+                                            class="card-img-top">
+                                        </a>
+                                    </slide>
+                                </carousel>
+
+                                <!-- BOTÃO DROPDOWN -->
+                                <div class="btn-group float-right btndrop" dropdown>
+                                    <button dropdownToggle type="button"
+                                        class="btn btn-block btn-ghost-light dropdown-toggle"
+                                        style="opacity:0.7" [ngClass]="!lesao.imagens.length?'btn-ghost-dark':''">
+                                        <i class="icon-settings"><span class="caret"></span></i>
+                                    </button>
+                                    <ul *dropdownMenu class="dropdown-menu dropdown-menu-right" role="menu">
+                                        <li role="menuitem"><a class="dropdown-item" routerLink="/dashboard/extra/segmentar-imagens/{{tipoPainel}}_{{lesao.id}}" *ngIf="lesao.imagens.length">Segmentar</a></li>
+                                        <li role="menuitem"><a class="dropdown-item" (click)="abrirVisualizarPaciente(lesao.id, tipoPainel)">Visualizar paciente</a></li>
+                                    </ul>
+                                </div>
+
+                                <div class="box alert-warning text-center" *ngIf="!lesao.imagens.length">
+                                    <p class="conteudo">Não existe imagens cadastradas para esta lesão.</p>
+                                </div>
+                                
+                                <!-- DADOS DA LESÃO -->
+                                <div class="card-footer card-estilo">
+                                    <div class="campo"><small>Diag. Clínico:</small>
+                                        <span *ngIf="tipoPainel==='cirurgia'; else diagDermato">&nbsp;{{ lesao.diagnosticoClinico }}</span>
+                                        <ng-template #diagDermato>&nbsp;{{ lesao.diagnostico }}</ng-template>
+                                    </div>
+                                    <div class="campo"><small>Diag. Histo:</small>
+                                        <span *ngIf="lesao.diagnosticoHisto; else valorNull">&nbsp;{{ lesao.diagnosticoHisto }}</span>
+                                        <ng-template #valorNull>&nbsp;Não cadastrado</ng-template>
+                                    </div>
+                                    <div class="campo"><small>Região:</small><span>&nbsp;{{ lesao.regiao }}</span></div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- IMAGENS PEQUENAS-->
+                    <div class="row" *ngIf="!exibirImagensGrandes">
+                        <div class="col-6 col-sm-4 col-md-3 col-lg-2" *ngFor="let lesao of lesoes">
+                            <div class="card">
+
+                                <div [popover]="popTemplate" triggers="mouseenter:mouseleave" placement="top">
+                                    
+                                    <!-- CARROSSEL -->
+                                    <carousel *ngIf="lesao.imagens.length" [showIndicators]="false">
+                                        <slide *ngFor="let imagem of lesao.imagens">
+                                                <a href="{{url_api}}/api/imagem/baixar?nomeImg={{imagem.path}}&tipo={{tipoPainel}}" target="_blank">
+                                                    <img src="{{url_api}}/api/imagem/baixar?nomeImg={{imagem.path}}&tipo={{tipoPainel}}&largura=100&altura=100"
+                                                    alt="Lesão"
+                                                    class="card-img-top">
+                                                </a>
+                                        </slide>
+                                    </carousel>
+
+                                    <!-- BOTÃO DROPDOWN -->
+                                    <div class="btn-group float-right btndrop" dropdown>
+                                        <button dropdownToggle type="button"
+                                            class="btn btn-block btn-ghost-light dropdown-toggle"
+                                            style="opacity:0.7" [ngClass]="!lesao.imagens.length?'btn-ghost-dark':''">
+                                            <i class="icon-settings"><span class="caret"></span></i>
+                                        </button>
+                                        <ul *dropdownMenu class="dropdown-menu dropdown-menu-right" role="menu">
+                                            <li role="menuitem"><a class="dropdown-item" href="/dashboard/extra/segmentar-imagens">Segmentar</a></li>
+                                            <li role="menuitem"><a class="dropdown-item" (click)="abrirVisualizarPaciente(lesao.id, tipoPainel)">Visualizar paciente</a></li>
+                                        </ul>
+                                    </div>
+                                    
+                                    <!-- TEMPLATE POPOVER -->
+                                    <ng-template #popTemplate>
+                                        <div class="campo"><small>Diag. Clínico:</small>
+                                            <span *ngIf="tipoPainel==='cirurgia'; else diagDermato">&nbsp;{{ lesao.diagnosticoClinico }}</span>
+                                            <ng-template #diagDermato>&nbsp;{{ lesao.diagnostico }}</ng-template>
+                                        </div>
+                                        <div class="campo"><small>Diag. Histo:</small>
+                                            <span *ngIf="lesao.diagnosticoHisto; else valorNull">&nbsp;{{ lesao.diagnosticoHisto }}</span>
+                                            <ng-template #valorNull>&nbsp;Não cadastrado</ng-template>
+                                        </div>
+                                        <div class="campo"><small>Região:</small><span>&nbsp;{{ lesao.regiao }}</span></div>
+                                    </ng-template>
+
+                                    <div class="box  alert-warning text-center" *ngIf="!lesao.imagens.length">
+                                        <p class="conteudo">Não existe imagens cadastradas para esta lesão.</p>
+                                    </div>
+                                </div>
+                            
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- PAGINAÇÃO -->
+                    <div class="card-body row d-flex justify-content-center">
+                        <pagination [totalItems]="totalItens"
+                                    [maxSize]="maxPagLinks"
+                                    [(ngModel)]="paginaAtual"
+                                    (pageChanged)="mudaPagina($event)"
+                                    [itemsPerPage]="itensPorPag"
+                                    previousText="Anterior"
+                                    nextText="Próxima">
+                        </pagination>                        
+                    </div>
+                    <div class="alert alert-secondary text-center" role="alert" style="margin-top: -20px;">
+                        <strong> Pagina {{ this.paginaAtual }} de {{ this.totalPaginas }} </strong>
+                    </div>               
+                    <!-- PAGINAÇÃO -->
+                
+                </div>
+            </div>
+            <!-- FIM PAINEL DE LESÕES -->
+    </div>
+</div>
+
