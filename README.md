@@ -1,31 +1,26 @@
 # PAD-UFES-20 repository
 
-This repository gives access to the software developed to collect and analyse the
-data present in the `PAD-UFES-20` dataset, which is available for download at [zenodo.org](https://zenodo.org/record/3903894#.XvZu8HVKiUk)
-<hr>
-
-## Analysis   
-[A Jupyter notebook](analysis/pad-ufes-20-analysis.ipynb) was coded to analyse the `PAD-UFES-20` dataset.
-This exploratory analysis takes into account the number of samples per diagnostic, the patients age distribution,
-the frequency of each anatomical region per diagnostic and the patients family background.
-
-<hr>
-
-## Figures
-This folder contains all plots obtained from the [data analysis](analysis/pad-ufes-20-analysis.ipynb)
-and a schematic of the [software](software) architecture used to collect the data.
-
+This repository contains the code related to the `PAD-UFES-20` dataset, which is available for download on[zenodo.org](https://zenodo.org/record/3903894#.XvZu8HVKiUk)
 <hr>
 
 ## Sanity Check
-Makes available a [script](sanity_check/sanity_check.py) coded to check the sanity of the data.
-It checks if there are any missing data, and if there is a corresponding image for each image
-path in the dataset. Besides, it checks for abnormalities, i.g., patients older than 100 years old,
-or lesions region that do not correspond to any of the 15 macro-regions described in [ref paper](link paper)   
+This [script](sanity_check/sanity_check.py) performs a sanity check to make sure the `metadata.csv` is ok. Essentialy, we check the `img_id` and the correspondent images, anomaly on data, etc. If everything is ok, the script outputs a message on the screen saying it's ok.
+<hr>
+
+## Data Exploratoring Analysis (DEA)
+In this [Jupyter notebook](analysis/pad-ufes-20-analysis.ipynb) we present a brief DEA to assess the metadata presented in `PAD-UFES-20`. We analyze the samples frequency for each skin lesion, patient's age distribution, anatomical region, etc.
+![age_dist](https://github.com/labcin-ufes/PAD-UFES-20/blob/master/figures/age_distribution.png)
+
+<hr>
 
 ## Software
-In this folder is available all the code used to build the platform to collect the data.
-It is divided into two main parts, described as follows:
+The [software folder](https://github.com/labcin-ufes/PAD-UFES-20/tree/master/software) contains the code we developed to build the webservers to collect data. Each part of this folder has an individual `README.d`. It basicaly contains two parts:
+* [Fronted](software/frontend)
+* [Server](software/server)
 
-* [Fronted](software/frontend): Implements all the user view, making it possible to send requests to the server.
-* [Server](software/server): Manages the database, allowing access to the data when requested by the frontend through http requests. 
+This figure summarizes how the webserver works:
+![webserver](https://github.com/labcin-ufes/PAD-UFES-20/blob/master/figures/webserver.png)
+
+
+<hr>
+If you have any suggestions or find any bug, please, don't hesitate to contact us.
