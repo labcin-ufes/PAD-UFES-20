@@ -1,6 +1,6 @@
 # PAD-UFES-20 repository
 
-This repository contains the code related to the `PAD-UFES-20` dataset, which is available for download on[zenodo.org](https://zenodo.org/record/3903894#.XvZu8HVKiUk)
+This repository contains the code related to the `PAD-UFES-20` dataset, which is available for download on [zenodo.org](https://zenodo.org/record/3903894#.XvZu8HVKiUk)
 <hr>
 
 ## Sanity Check
